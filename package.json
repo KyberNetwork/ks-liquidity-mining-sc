@@ -10,7 +10,8 @@
     "c": "printf 'yes' | yarn hardhat compile",
     "coverage": "hardhat coverage",
     "prettier": "prettier --write",
-    "prettierAll": "prettier --write contracts/* && prettier --write test/**/*.ts && prettier --write scripts/* && prettier --write deployment/*"
+    "prettierAll": "prettier -w '(contracts|scripts|test|foundry-tests)/**/*.(sol|json|ts)' && yarn solhint 'contracts/**/*.sol' 'foundry-tests/**/*.sol'",
+    "lint:check": "prettier --check '(contracts|scripts|test|foundry-tests)/**/*.(sol|json|js|ts)'"
   },
   "repository": {
     "type": "git",
