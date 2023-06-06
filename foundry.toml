@@ -1,0 +1,36 @@
+[profile.default]
+src = 'contracts'
+out = 'out'
+libs = ['node_modules','lib']
+fs_permissions = [{ access = "read", path = "./"}]
+remappings = [
+    '@ensdomains/=node_modules/@ensdomains/',
+    '@kyber.network/=node_modules/@kyber.network/',
+    '@openzeppelin/=node_modules/@openzeppelin/',
+    'eth-gas-reporter/=node_modules/eth-gas-reporter/',
+    'hardhat/=node_modules/hardhat/',
+    '@root/=contracts/'
+]
+
+optimizer_runs = 200
+verbosity = 3
+fuzz_runs = 2048
+
+[fmt]
+tab_width = 2
+number_underscore = "thousands"
+quote_style = "single"
+
+[rpc_endpoints]
+mainnet = "https://cloudflare-eth.com"
+goerli = "https://eth-goerli.public.blastapi.io"
+sepolia = "https://eth-sepolia.public.blastapi.io"
+polygon = "https://rpc-mainnet.maticvigil.com/"
+avax = "https://api.avax.network/ext/bc/C/rpc"
+
+[etherscan]
+mainnet = { key = "${ETHERSCAN_KEY}" }
+goerli = { key = "${ETHERSCAN_KEY}" }
+polygon = { key = "${POLYGONSCAN_KEY}" }
+
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
