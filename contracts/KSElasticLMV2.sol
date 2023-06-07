@@ -170,8 +170,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
 
     //if phase not settled, update sumReward.
     //if phase already settled then it's not needed since sumReward would be unchanged
-    if (block.timestamp > farms[fId].lastTouchedTime && !phase.isSettled)
-      _updateFarmSumRewardPerLiquidity(fId);
+    if (!phase.isSettled) _updateFarmSumRewardPerLiquidity(fId);
 
     //override phase data with new data
     phase.startTime = phaseInput.startTime;
@@ -204,8 +203,8 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
 
     if (farms[fId].phase.isSettled) revert PhaseSettled();
 
-    //update sumReward if time passes
-    if (block.timestamp > farms[fId].lastTouchedTime) _updateFarmSumRewardPerLiquidity(fId);
+    //update sumReward
+    _updateFarmSumRewardPerLiquidity(fId);
 
     //close phase so settled must be true
     if (!farms[fId].phase.isSettled) farms[fId].phase.isSettled = true;
@@ -673,8 +672,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     }
   }
 
-  /// @dev update farm's sumRewardPerLiquidity
-  /// @dev update farm's lastUpdatedTime
+  /// @dev if block.timestamp > lastTouchedTime, update sumRewardPerLiquidity. Otherwise just return it
   /// @dev if block.timestamp > farm's endTime then update phase to settled
   /// @param fId farm's id
   /// @return curSumRewardPerLiquidity array of sumRewardPerLiquidity until now
@@ -687,32 +685,49 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     uint32 lastTouchedTime = farms[fId].lastTouchedTime;
     uint32 endTime = farms[fId].phase.endTime;
     bool isSettled = farms[fId].phase.isSettled;
+    uint256 liquidity = farms[fId].liquidity;
 
-    for (uint256 i; i < length; ) {
-      uint256 preSumRewardPerLiquidity = farms[fId].sumRewardPerLiquidity[i];
+    if (block.timestamp > lastTouchedTime) {
+      for (uint256 i; i < length; ) {
+        curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
+        uint256 deltaSumRewardPerLiquidity;
 
-      //calculate sumReward from lastTouchedTime until now
-      curSumRewardPerLiquidity[i] = _calcSumRewardPerLiquidity(
-        farms[fId].phase.rewards[i].rewardAmount,
-        farms[fId].phase.startTime,
-        endTime,
-        lastTouchedTime,
-        farms[fId].liquidity,
-        isSettled,
-        preSumRewardPerLiquidity
-      );
+        //calculate deltaSumReward incase there is any liquidity in farm and farm is not settled yet
+        if (liquidity > 0 && !isSettled) {
+          deltaSumRewardPerLiquidity = _calcDeltaSumRewardPerLiquidity(
+            farms[fId].phase.rewards[i].rewardAmount,
+            farms[fId].phase.startTime,
+            endTime,
+            lastTouchedTime,
+            liquidity
+          );
+        }
 
-      //if there is something changes, update into storage
-      if (curSumRewardPerLiquidity[i] != preSumRewardPerLiquidity)
-        farms[fId].sumRewardPerLiquidity[i] = curSumRewardPerLiquidity[i];
+        if (deltaSumRewardPerLiquidity != 0) {
+          farms[fId].sumRewardPerLiquidity[i] =
+            curSumRewardPerLiquidity[i] +
+            deltaSumRewardPerLiquidity;
 
-      unchecked {
-        ++i;
+          curSumRewardPerLiquidity[i] += deltaSumRewardPerLiquidity;
+        }
+
+        unchecked {
+          ++i;
+        }
+      }
+
+      farms[fId].lastTouchedTime = uint32(block.timestamp);
+    } else {
+      for (uint256 i; i < length; ) {
+        curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
+
+        unchecked {
+          ++i;
+        }
       }
     }
 
-    //update farm lastTouchedTime, if passed endTime, update phase to settled
-    if (block.timestamp > lastTouchedTime) farms[fId].lastTouchedTime = uint32(block.timestamp);
+    //if passed endTime, update phase to settled
     if (block.timestamp > endTime && !isSettled) farms[fId].phase.isSettled = true;
   }
 
@@ -835,31 +850,22 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
   /// @param endTime farm's endTime
   /// @param lastTouchedTime farm's lastTouchedTime
   /// @param totalLiquidity farm's total liquidity
-  /// @param isSettled farm phase is settled or not
-  /// @return sumRewardPerLiquidity until now
-  function _calcSumRewardPerLiquidity(
+  /// @return deltaSumRewardPerLiquidity from lastTouchedTime till now
+  function _calcDeltaSumRewardPerLiquidity(
     uint256 rewardAmount,
     uint32 startTime,
     uint32 endTime,
     uint32 lastTouchedTime,
-    uint256 totalLiquidity,
-    bool isSettled,
-    uint256 currentSumRewardPerLiquidity
-  ) internal view returns (uint256) {
-    if (block.timestamp > lastTouchedTime && totalLiquidity != 0 && !isSettled) {
-      uint256 deltaSumRewardPerLiquidity = LMMath.calcSumRewardPerLiquidity(
-        rewardAmount,
-        startTime,
-        endTime,
-        uint32(block.timestamp),
-        lastTouchedTime,
-        totalLiquidity
-      );
-
-      currentSumRewardPerLiquidity += deltaSumRewardPerLiquidity;
-    }
-
-    return currentSumRewardPerLiquidity;
+    uint256 totalLiquidity
+  ) internal view returns (uint256 deltaSumRewardPerLiquidity) {
+    deltaSumRewardPerLiquidity = LMMath.calcSumRewardPerLiquidity(
+      rewardAmount,
+      startTime,
+      endTime,
+      uint32(block.timestamp),
+      lastTouchedTime,
+      totalLiquidity
+    );
   }
 
   /// @dev check if range is valid to be add to farm, revert on fail
