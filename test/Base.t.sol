@@ -18,7 +18,7 @@ import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManager.so
 contract Base is Test {
   using SafeERC20 for IERC20;
 
-  string MAINNET_RPC_URL = vm.envString('MAINNET_RPC_URL');
+  string ETH_NODE_URL = vm.envString('ETH_NODE_URL');
   address ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
   address WETH = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
@@ -59,7 +59,7 @@ contract Base is Test {
   uint256 snapShotDeposit;
 
   function setUp() public virtual {
-    mainnetFork = vm.createFork(MAINNET_RPC_URL);
+    mainnetFork = vm.createFork(ETH_NODE_URL);
     vm.selectFork(mainnetFork);
     vm.rollFork(16_146_028);
 

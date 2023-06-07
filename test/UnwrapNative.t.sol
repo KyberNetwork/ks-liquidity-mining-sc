@@ -23,29 +23,41 @@ contract UnwrapNative is Base {
   address wethWhale = 0xF04a5cC80B1E94C69B48f5ee68a08CD2F09A7c3E;
 
   address wethUsdtPool = 0x7d697d789ee19bc376474E0167BADe9535A28CF4;
+  address wstethWethPool = 0xeBfE63Ba0264aD639B3C41d2bfE1aD708F683bc8;
 
   uint256 fWethId;
+
   uint256 nftId = 1; //belongs to poolId 1, liquidity > 0
   uint128 nftLiq = 117546247299525;
   uint256 amountWethWhenRemoveLiquidity = 784318538031233553; //get by call directly to posManager
   uint256 amountWethWhenClaimFee = 17825205570209216; // get by call directly to posManager
 
+  uint256 fWethId2;
+  uint256 nftId2 = 96;
+  uint128 nft2Liq = 226263781797256566635813;
+  uint256 amountWethWhenRemoveLiquidity2 = 1933092082103344048210;
+  uint256 amountWethWhenClaimFee2 = 3359677506938625020;
+
   function setUp() public override {
     super.setUp();
 
+    vm.startPrank(deployer);
     ranges[1].tickLower = -201000;
     ranges[1].tickUpper = -200000;
-
-    vm.startPrank(deployer);
     fWethId = lm.addFarm(wethUsdtPool, ranges, phase, true);
+
+    ranges[1].tickLower = 700;
+    ranges[1].tickUpper = 900;
+    fWethId2 = lm.addFarm(wstethWethPool, ranges, phase, true);
     vm.stopPrank();
 
     vm.startPrank(wethWhale);
-    weth.safeTransfer(address(lm), rewardAmount);
+    weth.safeTransfer(address(lm), rewardAmount * 2);
     vm.stopPrank();
 
     vm.label(address(weth), 'WETH');
-    vm.label(pool, 'Pool ID 1');
+    vm.label(wethUsdtPool, 'Pool ID 1');
+    vm.label(wstethWethPool, 'Pool ID 22');
 
     uint256[] memory nfts = new uint256[](1);
     nfts[0] = nftId;
@@ -55,6 +67,14 @@ contract UnwrapNative is Base {
     vm.startPrank(nftOwner);
     nft.approve(address(lm), nftId);
     lm.deposit(fWethId, 1, nfts, jensen);
+    vm.stopPrank();
+
+    address nftOwner2 = nft.ownerOf(nftId2);
+    nfts[0] = nftId2;
+
+    vm.startPrank(nftOwner2);
+    nft.approve(address(lm), nftId2);
+    lm.deposit(fWethId2, 1, nfts, jensen);
     vm.stopPrank();
   }
 
@@ -75,9 +95,20 @@ contract UnwrapNative is Base {
     assertEq(lastSumRewardPerLiquidity[0], 0);
     assertEq(lastSumRewardPerLiquidity[1], 0);
 
+    (, fIdDeposited, rangeIdDeposited, liquidityDeposited, lastSumRewardPerLiquidity, ) = lm
+      .getStake(nftId2);
+
+    assertEq(fIdDeposited, fWethId2);
+    assertEq(rangeIdDeposited, 1);
+    assertEq(nft.ownerOf(nftId), address(lm));
+    assertEq(liquidityDeposited, _getLiq(nftId2) * 2);
+    assertEq(lastSumRewardPerLiquidity[0], 0);
+    assertEq(lastSumRewardPerLiquidity[1], 0);
+
     uint256[] memory listNftIds = lm.getDepositedNFTs(jensen);
-    assertEq(listNftIds.length, 1);
+    assertEq(listNftIds.length, 2);
     assertEq(listNftIds[0], nftId);
+    assertEq(listNftIds[1], nftId2);
   }
 
   function testUnwrapNativeRemoveAllLiquidity() public {
@@ -114,5 +145,32 @@ contract UnwrapNative is Base {
     uint256 balanceAfter = payable(jensen).balance;
 
     assertEq(balanceAfter - balanceBefore, amountWethWhenRemoveLiquidity + amountWethWhenClaimFee);
+  }
+
+  function testUnwrapNativeRemoveAllLiquidityAnotherFarm() public {
+    uint256 balanceBefore = payable(jensen).balance;
+
+    vm.startPrank(jensen);
+    lm.removeLiquidity(nftId2, nft2Liq, 0, 0, block.timestamp + 3600, false, true);
+    vm.stopPrank();
+
+    uint256 balanceAfter = payable(jensen).balance;
+
+    assertEq(balanceAfter - balanceBefore, amountWethWhenRemoveLiquidity2);
+  }
+
+  function testUnwrapNativeRemoveAllLiquidityAndClaimFeeAnotherFarm() public {
+    uint256 balanceBefore = payable(jensen).balance;
+
+    vm.startPrank(jensen);
+    lm.removeLiquidity(nftId2, nft2Liq, 0, 0, block.timestamp + 3600, true, true);
+    vm.stopPrank();
+
+    uint256 balanceAfter = payable(jensen).balance;
+
+    assertEq(
+      balanceAfter - balanceBefore,
+      amountWethWhenRemoveLiquidity2 + amountWethWhenClaimFee2
+    );
   }
 }

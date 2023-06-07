@@ -144,5 +144,12 @@ docs/
 # Dotenv file
 .env
 
+# dependencies
 node_modules
+
+# foundry deployment
+broadcast
+
+# coverage report
+lcov.info
 

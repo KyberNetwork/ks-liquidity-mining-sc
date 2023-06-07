@@ -507,7 +507,7 @@ contract RemoveLiquidity is Base {
     private
     returns (MockToken mockUsdc, MockToken mockUsdt, MockNftManager mockNft, MockPool mockPool)
   {
-    mainnetFork = vm.createFork(MAINNET_RPC_URL);
+    mainnetFork = vm.createFork(ETH_NODE_URL);
     vm.selectFork(mainnetFork);
     vm.rollFork(16_146_028);
 

@@ -27,6 +27,7 @@ import {WithdrawUnusedRewards} from './WithdrawUnusedRewards.t.sol';
 import {GetFarm} from './GetFarm.t.sol';
 import {TransferAdmin} from './TransferAdmin.t.sol';
 import {UpdateOperator} from './UpdateOperator.t.sol';
+import {UpdateHelper} from './UpdateHelper.t.sol';
 import {WithdrawEmergency} from './WithdrawEmergency.t.sol';
 
 contract Full is
@@ -43,6 +44,7 @@ contract Full is
   AddLiquidity,
   RemoveLiquidity,
   UpdateOperator,
+  UpdateHelper,
   Withdraw,
   WithdrawEmergency,
   WithdrawUnusedRewards
