@@ -41,6 +41,7 @@ contract ClaimFee is Base {
     mockPool = new MockPool(mockUsdc, mockUsdt);
     mockNft.setAddressToPoolId(address(mockPool), 12);
 
+    vm.startPrank(deployer);
     helper = new KSElasticLMHelper();
     lm = new KSElasticLMV2(IERC721(address(mockNft)), helper);
 
