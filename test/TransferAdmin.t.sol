@@ -22,7 +22,7 @@ contract TransferAdmin is Base {
     lm.transferAdmin(jensen);
     vm.stopPrank();
 
-    address newAdmin = lm.getAdmin();
+    address newAdmin = lm.admin();
 
     assertEq(jensen, newAdmin);
   }
