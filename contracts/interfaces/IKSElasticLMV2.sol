@@ -195,9 +195,6 @@ interface IKSElasticLMV2 {
   function withdrawEmergency(uint256[] calldata nftIds) external;
 
   // ======== view ============
-
-  function getAdmin() external view returns (address);
-
   function getNft() external view returns (IERC721);
 
   function getFarm(

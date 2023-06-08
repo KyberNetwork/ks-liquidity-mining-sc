@@ -474,10 +474,6 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
   }
 
   // ======== getter ============
-  function getAdmin() external view override returns (address) {
-    return admin;
-  }
-
   function getNft() external view override returns (IERC721) {
     return nft;
   }
