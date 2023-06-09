@@ -15,10 +15,8 @@ contract KyberSwapFarmingToken is ERC20, ERC20Burnable, ERC20Permit, AccessContr
 
   mapping(address => bool) public isWhitelist;
 
-  constructor(
-    address owner
-  ) ERC20('KyberSwapFarmingToken', 'KS-FT') ERC20Permit('KyberSwapFarmingToken') {
-    _setupRole(DEFAULT_ADMIN_ROLE, owner);
+  constructor() ERC20('KyberSwapFarmingToken', 'KS-FT') ERC20Permit('KyberSwapFarmingToken') {
+    _setupRole(DEFAULT_ADMIN_ROLE, msg.sender);
     _setupRole(OPERATOR_ROLE, msg.sender);
   }
 
