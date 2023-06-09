@@ -81,4 +81,6 @@ interface IKyberSwapFarmingToken is IAccessControl {
   function addWhitelist(address account) external;
 
   function removeWhitelist(address account) external;
+
+  function DEFAULT_ADMIN_ROLE() external view returns (bytes32);
 }

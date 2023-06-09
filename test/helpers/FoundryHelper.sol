@@ -37,7 +37,8 @@ abstract contract FoundryHelper is Test {
     (user4, privUser4) = makeAddrAndKey('user4');
   }
 
-  function _signMessage(bytes32 message, uint256 _key) internal returns (bytes memory) {
+  //restricted to pure to avoid noisy warnings
+  function _signMessage(bytes32 message, uint256 _key) internal pure returns (bytes memory) {
     (uint8 v, bytes32 r, bytes32 s) = vm.sign(_key, keccak256(abi.encodePacked(message)));
     return abi.encodePacked(r, s, v);
   }

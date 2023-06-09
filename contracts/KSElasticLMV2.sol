@@ -132,10 +132,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     //deploy farmingToken if needed
     address destination;
     if (isUsingToken) {
-      bytes memory creationCode = abi.encodePacked(
-        farmingTokenCreationCode,
-        abi.encode(msg.sender)
-      );
+      bytes memory creationCode = farmingTokenCreationCode;
       bytes32 salt = keccak256(abi.encode(msg.sender, fId));
       assembly {
         destination := create2(0, add(creationCode, 32), mload(creationCode), salt)
@@ -143,7 +140,13 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
           revert(0, 0)
         }
       }
+
       farm.farmingToken = destination;
+
+      //grant admin to msg.sender
+      IKyberSwapFarmingToken farmingToken = IKyberSwapFarmingToken(destination);
+
+      farmingToken.grantRole(farmingToken.DEFAULT_ADMIN_ROLE(), msg.sender);
     }
 
     //last touched time would be startTime
