@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.9;
 
-import {FoundryHelper} from './helpers/FoundryHelper.sol';
+import {FoundryHelper} from '../helpers/FoundryHelper.sol';
 import {KSElasticLMV2} from 'contracts/KSElasticLMV2.sol';
 import {KyberSwapFarmingToken} from 'contracts/periphery/KyberSwapFarmingToken.sol';
 import {KSElasticLMHelper} from 'contracts/KSElasticLMHelper.sol';
