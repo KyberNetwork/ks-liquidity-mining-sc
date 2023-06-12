@@ -4,14 +4,11 @@
   "description": "Smart Contracts for the Growth Features of KyberSwap",
   "main": "hardhat.config.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "t": "UPDATE_SNAPSHOT=1 TS_NODE_TRANSPILE_ONLY=1 yarn hardhat test --no-compile",
-    "compile": "yarn hardhat compile",
-    "c": "printf 'yes' | yarn hardhat compile",
-    "coverage": "hardhat coverage",
+    "compile": "forge compile",
+    "coverage": "forge coverage",
     "prettier": "prettier --write",
-    "prettierAll": "prettier -w '(contracts|scripts|test|foundry-tests)/**/*.(sol|json|ts)' && yarn solhint 'contracts/**/*.sol' 'foundry-tests/**/*.sol'",
-    "lint:check": "prettier --check '(contracts|scripts|test|foundry-tests)/**/*.(sol|json|js|ts)'"
+    "prettierAll": "prettier -w '(contracts|script|test)/**/*.(sol|json|js|ts)' 'contracts/*.sol' && yarn solhint 'contracts/**/*.sol' 'contracts/*.sol' 'test/**/*.sol'",
+    "lint:check": "prettier --check '(contracts|script|test)/**/*.(sol|json|js|ts)' 'contracts/*.sol'"
   },
   "repository": {
     "type": "git",
