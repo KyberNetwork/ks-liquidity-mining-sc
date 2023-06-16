@@ -64,6 +64,7 @@ interface IKyberSwapFarmingToken {
    *
    * Requirements:
    *
+   * - `msg.sender` must be operator
    * - `account` cannot be the zero address.
    */
   function mint(address account, uint256 amount) external;
@@ -71,10 +72,20 @@ interface IKyberSwapFarmingToken {
   /**
    * @dev Destroys `amount` tokens from the caller.
    *
+   * Requirements:
+   *
+   * - `msg.sender` must be operator
+   * - `account` cannot be the zero address.
+   *
    * See {ERC20-_burn}.
    */
 
   function burn(address account, uint256 amount) external;
+
+  /**
+   * @dev address of operator, only be set once in constructor.
+   * only operator can mint/burn tokens
+   */
 
   function operator() external view returns (address);
 }

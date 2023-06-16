@@ -6,7 +6,8 @@ import '@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol';
 import '@openzeppelin/contracts/token/ERC20/extensions/draft-ERC20Permit.sol';
 
 contract KyberSwapFarmingToken is ERC20, ERC20Burnable, ERC20Permit {
-  address public operator;
+  //for mint/burn tokens, only be set once in constructor
+  address public immutable operator;
 
   error Forbidden();
 
