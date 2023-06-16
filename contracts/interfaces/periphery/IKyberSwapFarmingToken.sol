@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity >=0.8.0;
 
-import '@openzeppelin/contracts/access/IAccessControl.sol';
-
-interface IKyberSwapFarmingToken is IAccessControl {
+interface IKyberSwapFarmingToken {
   /**
    * @dev Returns the amount of tokens in existence.
    */
@@ -66,6 +64,7 @@ interface IKyberSwapFarmingToken is IAccessControl {
    *
    * Requirements:
    *
+   * - `msg.sender` must be operator
    * - `account` cannot be the zero address.
    */
   function mint(address account, uint256 amount) external;
@@ -73,14 +72,20 @@ interface IKyberSwapFarmingToken is IAccessControl {
   /**
    * @dev Destroys `amount` tokens from the caller.
    *
+   * Requirements:
+   *
+   * - `msg.sender` must be operator
+   * - `account` cannot be the zero address.
+   *
    * See {ERC20-_burn}.
    */
 
   function burn(address account, uint256 amount) external;
 
-  function addWhitelist(address account) external;
+  /**
+   * @dev address of operator, only be set once in constructor.
+   * only operator can mint/burn tokens
+   */
 
-  function removeWhitelist(address account) external;
-
-  function DEFAULT_ADMIN_ROLE() external view returns (bytes32);
+  function operator() external view returns (address);
 }

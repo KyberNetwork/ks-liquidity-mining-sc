@@ -62,14 +62,7 @@ contract AddFarm is Base {
 
     assertTrue(address(farmingToken) != address(0));
 
-    assertEq(IKyberSwapFarmingToken(farmingToken).hasRole(0x00, deployer), true);
-    assertEq(
-      IKyberSwapFarmingToken(farmingToken).hasRole(
-        0x523a704056dcd17bcf83bed8b68c59416dac1119be77755efe3bde0a64e46e0c,
-        address(lm)
-      ),
-      true
-    );
+    assertEq(IKyberSwapFarmingToken(farmingToken).operator(), address(lm));
   }
 
   function testAddFarmRevertInvalidRangeTick() public {
