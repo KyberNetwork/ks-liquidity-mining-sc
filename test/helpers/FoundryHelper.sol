@@ -46,4 +46,35 @@ abstract contract FoundryHelper is Test {
   function _computeHash(bytes32 message) internal pure returns (bytes32) {
     return keccak256(abi.encodePacked(message));
   }
+
+  function _toArray(uint256 a) internal pure returns (uint256[] memory array) {
+    array = new uint256[](1);
+
+    array[0] = a;
+  }
+
+  function _toArray(address a) internal pure returns (address[] memory array) {
+    array = new address[](1);
+
+    array[0] = a;
+  }
+
+  function _toArray(uint256 a, uint256 b) internal pure returns (uint256[] memory array) {
+    array = new uint256[](2);
+
+    array[0] = a;
+    array[1] = b;
+  }
+
+  function _toArray(
+    uint256 a,
+    uint256 b,
+    uint256 c
+  ) internal pure returns (uint256[] memory array) {
+    array = new uint256[](3);
+
+    array[0] = a;
+    array[1] = b;
+    array[2] = c;
+  }
 }

@@ -25,7 +25,7 @@ quote_style = "single"
 mainnet = "https://cloudflare-eth.com"
 goerli = "https://eth-goerli.public.blastapi.io"
 sepolia = "https://eth-sepolia.public.blastapi.io"
-polygon = "https://rpc-mainnet.maticvigil.com/"
+polygon = "https://polygon-rpc.com"
 avax = "https://api.avax.network/ext/bc/C/rpc"
 
 [etherscan]
