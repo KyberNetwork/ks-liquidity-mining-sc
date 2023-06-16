@@ -142,11 +142,6 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
       }
 
       farm.farmingToken = destination;
-
-      //grant admin to msg.sender
-      IKyberSwapFarmingToken farmingToken = IKyberSwapFarmingToken(destination);
-
-      farmingToken.grantRole(farmingToken.DEFAULT_ADMIN_ROLE(), msg.sender);
     }
 
     //last touched time would be startTime

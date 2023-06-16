@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: agpl-3.0
 pragma solidity >=0.8.0;
 
-import '@openzeppelin/contracts/access/IAccessControl.sol';
-
-interface IKyberSwapFarmingToken is IAccessControl {
+interface IKyberSwapFarmingToken {
   /**
    * @dev Returns the amount of tokens in existence.
    */
@@ -78,9 +76,5 @@ interface IKyberSwapFarmingToken is IAccessControl {
 
   function burn(address account, uint256 amount) external;
 
-  function addWhitelist(address account) external;
-
-  function removeWhitelist(address account) external;
-
-  function DEFAULT_ADMIN_ROLE() external view returns (bytes32);
+  function operator() external view returns (address);
 }

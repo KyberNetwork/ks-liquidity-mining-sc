@@ -891,28 +891,11 @@ contract Integration is FoundryHelper {
     farm.deposit(fId, 1, listNFT, user1);
 
     (, , , , address fToken, , ) = farm.getFarm(fId);
+
+    assertEq(IKyberSwapFarmingToken(fToken).operator(), address(farm));
     assertEq(IKyberSwapFarmingToken(fToken).balanceOf(address(user1)), 70 ether); // 30 index 0 + 20*2 index 1
-    vm.expectRevert(abi.encodeWithSignature('InvalidOperation()'));
-    IKyberSwapFarmingToken(fToken).transfer(address(user2), 10 ether);
 
-    assertEq(
-      IKyberSwapFarmingToken(fToken).hasRole(
-        0x523a704056dcd17bcf83bed8b68c59416dac1119be77755efe3bde0a64e46e0c,
-        address(farm)
-      ),
-      true
-    ); // operator to farm contract
-    assertEq(
-      IKyberSwapFarmingToken(fToken).hasRole(
-        0x0000000000000000000000000000000000000000000000000000000000000000,
-        address(deployer)
-      ),
-      true
-    ); // admin to deployer
-
-    // whitelist to receiver, then user can transfer their token to , i,e receiver will be user 2
-    changePrank(deployer);
-    IKyberSwapFarmingToken(fToken).addWhitelist(address(user2));
+    // try to transfer
     changePrank(user1);
     IKyberSwapFarmingToken(fToken).transfer(address(user2), 10 ether);
     IKyberSwapFarmingToken(fToken).approve(address(deployer), MAX_UINT256);
