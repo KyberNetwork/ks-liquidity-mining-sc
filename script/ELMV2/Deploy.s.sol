@@ -13,7 +13,7 @@ import {IKSElasticLMHelper} from 'contracts/interfaces/IKSElasticLMHelper.sol';
 contract Deploy is Script {
   function run() external {
     uint256 deployerPrivateKey = vm.envUint('PRIVATE_KEY');
-    string memory deployFile = './script/input/input.json';
+    string memory deployFile = './script/ELMV2/input/input.json';
 
     vm.startBroadcast(deployerPrivateKey);
 

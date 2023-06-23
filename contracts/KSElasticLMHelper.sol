@@ -7,6 +7,9 @@ import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol
 import {MathConstants as C} from 'contracts/libraries/MathConstants.sol';
 import {FullMath} from 'contracts/libraries/FullMath.sol';
 import {LMMath} from 'contracts/libraries/LMMath.sol';
+import {QtyDeltaMath} from 'contracts/libraries/QtyDeltaMath.sol';
+import {TickMath} from 'contracts/libraries/TickMath.sol';
+import {SafeCast} from './libraries/SafeCast.sol';
 import {ReinvestmentMath} from 'contracts/libraries/ReinvestmentMath.sol';
 
 import {IKSElasticLMHelper} from 'contracts/interfaces/IKSElasticLMHelper.sol';
@@ -19,6 +22,7 @@ import {KSAdmin} from './base/KSAdmin.sol';
 contract KSElasticLMHelper is IKSElasticLMHelper, KSAdmin {
   error PositionNotEligible();
 
+  using SafeCast for int256;
   using SafeERC20 for IERC20;
 
   event RescueFund(address token, uint256 amount);
@@ -33,6 +37,7 @@ contract KSElasticLMHelper is IKSElasticLMHelper, KSAdmin {
     emit RescueFund(address(token), amount);
   }
 
+  /* use by lmv1 */
   function checkPool(
     address pAddress,
     address nftContract,
@@ -42,7 +47,6 @@ contract KSElasticLMHelper is IKSElasticLMHelper, KSAdmin {
     return IBasePositionManager(nftContract).addressToPoolId(pAddress) == pData.poolId;
   }
 
-  /// @dev use virtual to be overrided to mock data for fuzz tests
   function getActiveTime(
     address pAddr,
     address nftContract,
@@ -84,7 +88,7 @@ contract KSElasticLMHelper is IKSElasticLMHelper, KSAdmin {
     return (poolInfo.token0, poolInfo.token1);
   }
 
-  // ======== read from farm ============
+  /* read information from farm v2 */
   function getCurrentUnclaimedReward(
     IELMV2 farm,
     uint256 nftId
@@ -181,7 +185,60 @@ contract KSElasticLMHelper is IKSElasticLMHelper, KSAdmin {
     }
   }
 
-  // ======== read from posManager ============
+  function getAmountsFromFarmingToken(
+    IELMV2 farm,
+    uint256 fId,
+    uint256 rangeId,
+    uint256 amount,
+    int24 tickLower,
+    int24 tickUpper
+  ) external view returns (uint256 amount0, uint256 amount1) {
+    (address poolAddress, IELMV2.RangeInfo[] memory ranges, , , , , ) = farm.getFarm(fId);
+    (uint160 sqrtP, int24 currentTick, , ) = IPoolStorage(poolAddress).getPoolState();
+
+    uint128 liquidity = uint128(amount / ranges[rangeId].weight);
+    int256 qty0;
+    int256 qty1;
+
+    if (currentTick < tickLower) {
+      qty0 = QtyDeltaMath.calcRequiredQty0(
+        TickMath.getSqrtRatioAtTick(tickLower),
+        TickMath.getSqrtRatioAtTick(tickUpper),
+        liquidity,
+        false
+      );
+
+      return (qty0.revToUint256(), 0);
+    }
+    if (currentTick >= tickUpper) {
+      qty1 = QtyDeltaMath.calcRequiredQty1(
+        TickMath.getSqrtRatioAtTick(tickLower),
+        TickMath.getSqrtRatioAtTick(tickUpper),
+        liquidity,
+        false
+      );
+
+      return (0, qty1.revToUint256());
+    }
+
+    qty0 = QtyDeltaMath.calcRequiredQty0(
+      sqrtP,
+      TickMath.getSqrtRatioAtTick(tickUpper),
+      liquidity,
+      false
+    );
+    qty1 = QtyDeltaMath.calcRequiredQty1(
+      TickMath.getSqrtRatioAtTick(tickLower),
+      sqrtP,
+      liquidity,
+      false
+    );
+
+    amount0 = qty0.revToUint256();
+    amount1 = qty1.revToUint256();
+  }
+
+  /* read information from posManager */
   function getPositionInfo(
     address nftContract,
     uint256 nftId
