@@ -13,11 +13,9 @@ library QtyDeltaMath {
   using SafeCast for uint256;
   using SafeCast for int128;
 
-  function calcUnlockQtys(uint160 initialSqrtP)
-    internal
-    pure
-    returns (uint256 qty0, uint256 qty1)
-  {
+  function calcUnlockQtys(
+    uint160 initialSqrtP
+  ) internal pure returns (uint256 qty0, uint256 qty1) {
     qty0 = FullMath.mulDivCeiling(C.MIN_LIQUIDITY, C.TWO_POW_96, initialSqrtP);
     qty1 = FullMath.mulDivCeiling(C.MIN_LIQUIDITY, initialSqrtP, C.TWO_POW_96);
   }
@@ -76,11 +74,10 @@ library QtyDeltaMath {
   /// @param sqrtP Current pool sqrt price
   /// @param liquidity Difference in reinvestment liquidity due to reinvestment token burn
   /// @return token0 quantity to be sent to the user
-  function getQty0FromBurnRTokens(uint160 sqrtP, uint256 liquidity)
-    internal
-    pure
-    returns (uint256)
-  {
+  function getQty0FromBurnRTokens(
+    uint160 sqrtP,
+    uint256 liquidity
+  ) internal pure returns (uint256) {
     return FullMath.mulDivFloor(liquidity, C.TWO_POW_96, sqrtP);
   }
 
@@ -89,11 +86,10 @@ library QtyDeltaMath {
   /// @param sqrtP Current pool sqrt price
   /// @param liquidity Difference in reinvestment liquidity due to reinvestment token burn
   /// @return token1 quantity to be sent to the user
-  function getQty1FromBurnRTokens(uint160 sqrtP, uint256 liquidity)
-    internal
-    pure
-    returns (uint256)
-  {
+  function getQty1FromBurnRTokens(
+    uint160 sqrtP,
+    uint256 liquidity
+  ) internal pure returns (uint256) {
     return FullMath.mulDivFloor(liquidity, sqrtP, C.TWO_POW_96);
   }
 
