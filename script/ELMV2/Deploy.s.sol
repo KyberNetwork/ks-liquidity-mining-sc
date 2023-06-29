@@ -38,3 +38,17 @@ contract Deploy is Script {
     vm.stopBroadcast();
   }
 }
+
+contract DeployHelper is Script {
+  function run() external {
+    uint256 deployerPrivateKey = vm.envUint('PRIVATE_KEY');
+
+    vm.startBroadcast(deployerPrivateKey);
+
+    address helperSC = address(new KSElasticLMHelper());
+
+    console.log('Helper address: ', helperSC);
+
+    vm.stopBroadcast();
+  }
+}

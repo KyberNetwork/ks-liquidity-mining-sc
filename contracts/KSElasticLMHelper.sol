@@ -192,7 +192,7 @@ contract KSElasticLMHelper is IKSElasticLMHelper, KSAdmin {
     uint256 amount,
     int24 tickLower,
     int24 tickUpper
-  ) external view returns (uint256 amount0, uint256 amount1) {
+  ) external view override returns (uint256 amount0, uint256 amount1) {
     (address poolAddress, IELMV2.RangeInfo[] memory ranges, , , , , ) = farm.getFarm(fId);
     (uint160 sqrtP, int24 currentTick, , ) = IPoolStorage(poolAddress).getPoolState();
 
