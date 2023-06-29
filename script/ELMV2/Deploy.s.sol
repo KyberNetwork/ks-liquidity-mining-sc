@@ -13,7 +13,7 @@ import {IKSElasticLMHelper} from 'contracts/interfaces/IKSElasticLMHelper.sol';
 contract Deploy is Script {
   function run() external {
     uint256 deployerPrivateKey = vm.envUint('PRIVATE_KEY');
-    string memory deployFile = './script/input/input.json';
+    string memory deployFile = './script/ELMV2/input/input.json';
 
     vm.startBroadcast(deployerPrivateKey);
 
@@ -33,6 +33,20 @@ contract Deploy is Script {
     farm.updateTokenCode(type(KyberSwapFarmingToken).creationCode);
 
     console.log('Farm address: ', address(farm));
+    console.log('Helper address: ', helperSC);
+
+    vm.stopBroadcast();
+  }
+}
+
+contract DeployHelper is Script {
+  function run() external {
+    uint256 deployerPrivateKey = vm.envUint('PRIVATE_KEY');
+
+    vm.startBroadcast(deployerPrivateKey);
+
+    address helperSC = address(new KSElasticLMHelper());
+
     console.log('Helper address: ', helperSC);
 
     vm.stopBroadcast();

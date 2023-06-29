@@ -48,6 +48,15 @@ interface IKSElasticLMHelper {
 
   function getUserInfo(IELMV2 farm, address user) external view returns (UserInfo[] memory);
 
+  function getAmountsFromFarmingToken(
+    IELMV2 farm,
+    uint256 fId,
+    uint256 rangeId,
+    uint256 amount,
+    int24 tickLower,
+    int24 tickUpper
+  ) external view returns (uint256 amount0, uint256 amount1);
+
   function getEligibleRanges(
     IELMV2 farm,
     uint256 fId,

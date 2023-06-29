@@ -25,11 +25,11 @@ contract AddFarm is Script {
     uint256 deployerPrivateKey = vm.envUint('PRIVATE_KEY');
 
     address elasticPool = 0xA852DDD69C13d42669840A692f6bBf94245ac54A;
-    address farmSC = 0xbb62F365ECffbaca1d255Eed77c60c70F840f6E2;
+    address farmSC = 0xFAaA95096BdF8f9d2E31ED371097e874974226C7;
     address rwToken1 = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address rwToken2 = 0xFbBd93fC3BE8B048c007666AF4846e4A36BACC95;
-    uint32 st = 1686214800;
-    uint32 et = 1686391200;
+    uint32 st = 1686905707;
+    uint32 et = 1688115307;
 
     vm.startBroadcast(deployerPrivateKey);
 

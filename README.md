@@ -25,7 +25,7 @@ run `forge coverage --report lcov` to output LCOV file
 
 # deploy
 add PRIVATE_KEY=your private key in .env file
-run `forge script script/Deploy.s.sol:Deploy --rpc-url <network> --broadcast --optimize --verify`
+run `forge script script/ELMV2/Deploy.s.sol:Deploy --rpc-url <network> --broadcast --optimize --verify`
 
 *incase deploy succeed but not verify, you can try to verify it again by running
 run `cast abi-encode "constructor(address,address)" "<nft address>" "<helper address>"`
@@ -41,4 +41,4 @@ run `forge verify-contract \
     --compiler-version v0.8.9+commit.e5eed63a`
 
 # add farm
-run `forge script script/AddFarm.s.sol:AddFarm --rpc-url <network> --broadcast`
+run `forge script script/ELMV2/AddFarm.s.sol:AddFarm --rpc-url <network> --broadcast`
