@@ -25,12 +25,16 @@ quote_style = "single"
 mainnet = "https://cloudflare-eth.com"
 goerli = "https://eth-goerli.public.blastapi.io"
 sepolia = "https://eth-sepolia.public.blastapi.io"
-polygon = "https://polygon-rpc.com"
+polygon = "https://polygon.kyberengineering.io"
 avax = "https://api.avax.network/ext/bc/C/rpc"
+bsc = "https://bsc.kyberengineering.io"
+arb = "https://rpc.ankr.com/arbitrum"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_KEY}" }
 goerli = { key = "${ETHERSCAN_KEY}" }
 polygon = { key = "${POLYGONSCAN_KEY}" }
+bsc = { key = "${BSC_SCAN}" }
+arb = { key = "${ARB_SCAN}" }
 
 # See more config options https://github.com/foundry-rs/foundry/tree/master/config

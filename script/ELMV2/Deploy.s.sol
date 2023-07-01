@@ -13,7 +13,7 @@ import {IKSElasticLMHelper} from 'contracts/interfaces/IKSElasticLMHelper.sol';
 contract Deploy is Script {
   function run() external {
     uint256 deployerPrivateKey = vm.envUint('PRIVATE_KEY');
-    string memory deployFile = './script/input/input.json';
+    string memory deployFile = './script/ELMV2/input/input.json';
 
     vm.startBroadcast(deployerPrivateKey);
 
@@ -34,6 +34,9 @@ contract Deploy is Script {
 
     console.log('Farm address: ', address(farm));
     console.log('Helper address: ', helperSC);
+
+    require(helperSC == 0x6AFeb9EDd6Cf44fA8E89b1eee28284e6dD7705C8, 'address mismatch');
+    require(address(farm) == 0xE44ec65521B85612fa7BC45d842645Fb4B690E4b, 'address mismatch');
 
     vm.stopBroadcast();
   }
