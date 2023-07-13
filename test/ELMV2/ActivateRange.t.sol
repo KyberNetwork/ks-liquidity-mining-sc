@@ -14,7 +14,7 @@ import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManager.so
 
 import {Base} from './Base.t.sol';
 
-contract ActiveRange is Base {
+contract ActivateRange is Base {
   using SafeERC20 for IERC20;
 
   function testActiveRangeSuccess() public {
@@ -24,7 +24,7 @@ contract ActiveRange is Base {
     vm.stopPrank();
 
     vm.startPrank(deployer);
-    lm.activeRange(fId, 0);
+    lm.activateRange(fId, 0);
     vm.stopPrank();
   }
 
@@ -36,7 +36,7 @@ contract ActiveRange is Base {
 
     vm.startPrank(deployer);
     vm.expectRevert(abi.encodeWithSignature('InvalidFarm()'));
-    lm.activeRange(99, 0);
+    lm.activateRange(99, 0);
     vm.stopPrank();
   }
 
@@ -48,14 +48,14 @@ contract ActiveRange is Base {
 
     vm.startPrank(deployer);
     vm.expectRevert(abi.encodeWithSignature('RangeNotFound()'));
-    lm.activeRange(fId, 10);
+    lm.activateRange(fId, 10);
     vm.stopPrank();
   }
 
   function testActiveRangeRevertNotRemoved() public {
     vm.startPrank(deployer);
     vm.expectRevert(abi.encodeWithSignature('RangeNotFound()'));
-    lm.activeRange(fId, 0);
+    lm.activateRange(fId, 0);
     vm.stopPrank();
   }
 }

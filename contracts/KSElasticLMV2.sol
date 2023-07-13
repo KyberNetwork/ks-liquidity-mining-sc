@@ -232,21 +232,21 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     if (rangeId >= farms[fId].ranges.length || farms[fId].ranges[rangeId].isRemoved)
       revert RangeNotFound();
 
-    //remove a range aka set isRemoved to tue, it's still be in ranges array but cannot deposit to this range anymore
+    //remove a range aka set isRemoved to true, it's still be in ranges array but cannot deposit to this range anymore
     farms[fId].ranges[rangeId].isRemoved = true;
 
     emit RemoveRange(fId, rangeId);
   }
 
-  function activeRange(uint256 fId, uint256 rangeId) external isOperator {
+  function activateRange(uint256 fId, uint256 rangeId) external isOperator {
     if (fId >= farmCount) revert InvalidFarm();
     if (rangeId >= farms[fId].ranges.length || !farms[fId].ranges[rangeId].isRemoved)
       revert RangeNotFound();
 
-    //active a removed range aka set isRemoved to false, this range can deposit now
+    //activate a removed range aka set isRemoved to false, this range can deposit now
     farms[fId].ranges[rangeId].isRemoved = false;
 
-    emit ActiveRange(fId, rangeId);
+    emit ActivateRange(fId, rangeId);
   }
 
   // ======== user ============

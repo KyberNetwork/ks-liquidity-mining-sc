@@ -856,8 +856,8 @@ contract ElasticV2 is FoundryHelper {
 
     //some time later, operator will active those ranges so user can deposit to it
     vm.startPrank(deployer);
-    lm.activeRange(fId, range2Id);
-    lm.activeRange(fId, range3Id);
+    lm.activateRange(fId, range2Id);
+    lm.activateRange(fId, range3Id);
     vm.stopPrank();
 
     //user start deposit to new ranges
@@ -927,7 +927,7 @@ contract ElasticV2 is FoundryHelper {
     vm.warp(startTime + 4 days);
 
     vm.startPrank(deployer);
-    lm.activeRange(fId, rangeId);
+    lm.activateRange(fId, rangeId);
     vm.stopPrank();
 
     vm.startPrank(jensen);
