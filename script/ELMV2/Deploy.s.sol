@@ -36,7 +36,7 @@ contract Deploy is Script {
     console.log('Helper address: ', helperSC);
 
     require(helperSC == 0x6AFeb9EDd6Cf44fA8E89b1eee28284e6dD7705C8, 'address mismatch');
-    require(address(farm) == 0xE44ec65521B85612fa7BC45d842645Fb4B690E4b, 'address mismatch');
+    require(address(farm) == 0xA70a1Ad0F91c52c79e177c5A18a7C9E1C4360e0e, 'address mismatch');
 
     vm.stopBroadcast();
   }
