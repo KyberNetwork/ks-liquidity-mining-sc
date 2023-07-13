@@ -29,6 +29,7 @@ import {TransferAdmin} from './TransferAdmin.t.sol';
 import {UpdateOperator} from './UpdateOperator.t.sol';
 import {UpdateHelper} from './UpdateHelper.t.sol';
 import {WithdrawEmergency} from './WithdrawEmergency.t.sol';
+import {ActiveRange} from './ActiveRange.t.sol';
 
 contract Full is
   Base,
@@ -47,7 +48,8 @@ contract Full is
   UpdateHelper,
   Withdraw,
   WithdrawEmergency,
-  WithdrawUnusedRewards
+  WithdrawUnusedRewards,
+  ActiveRange
 {
   using SafeERC20 for IERC20;
 }
