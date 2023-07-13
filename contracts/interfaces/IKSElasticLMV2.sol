@@ -44,6 +44,7 @@ interface IKSElasticLMV2 {
   event ForceClosePhase(uint256 indexed fId);
   event AddRange(uint256 indexed fId, RangeInput range);
   event RemoveRange(uint256 indexed fId, uint256 rangeId);
+  event ActivateRange(uint256 indexed fId, uint256 rangeId);
   event ExpandEndTimeAndRewards(uint256 indexed fId, uint256 duration, uint256[] rewardAmounts);
 
   event Deposit(

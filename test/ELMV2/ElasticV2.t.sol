@@ -815,4 +815,181 @@ contract ElasticV2 is FoundryHelper {
     assertApproxEqAbs(knc.balanceOf(rahoz), rewardAmount - rewardPhase1 - rewardPhase2, 10);
     assertApproxEqAbs(knc.balanceOf(address(lm)), 0, 10);
   }
+
+  function test_AddRangeButTemporaryDisabledItAndActiveLater() public {
+    uint256 range1Id = 0;
+    uint256 range2Id = 2;
+    uint256 range3Id = 3;
+
+    IKSElasticLMV2.RangeInput memory newRange1 = IKSElasticLMV2.RangeInput({
+      tickLower: -280001,
+      tickUpper: -275001,
+      weight: 2
+    });
+
+    IKSElasticLMV2.RangeInput memory newRange2 = IKSElasticLMV2.RangeInput({
+      tickLower: -280001,
+      tickUpper: -275001,
+      weight: 3
+    });
+
+    vm.startPrank(deployer);
+    lm.addRange(fId, newRange1);
+    lm.addRange(fId, newRange2);
+    lm.removeRange(fId, range2Id);
+    lm.removeRange(fId, range3Id);
+    vm.stopPrank();
+
+    vm.startPrank(deployer);
+    lm.deposit(fId, range1Id, _toArray(nftId), jensen); // active range
+    vm.stopPrank();
+
+    vm.startPrank(deployer);
+    vm.expectRevert(abi.encodeWithSignature('RangeNotFound()')); // disabled range
+    lm.deposit(fId, range2Id, _toArray(nftId2), jensen);
+
+    vm.expectRevert(abi.encodeWithSignature('RangeNotFound()')); // disabled range
+    lm.deposit(fId, range2Id, _toArray(nftId2), jensen);
+    vm.stopPrank();
+
+    vm.warp(startTime + 7 days);
+
+    //some time later, operator will active those ranges so user can deposit to it
+    vm.startPrank(deployer);
+    lm.activateRange(fId, range2Id);
+    lm.activateRange(fId, range3Id);
+    vm.stopPrank();
+
+    //user start deposit to new ranges
+    vm.startPrank(jensen);
+    lm.withdraw(fId, _toArray(nftId));
+
+    nft.setApprovalForAll(address(lm), true);
+    lm.deposit(fId, range2Id, _toArray(nftId), jensen); // new ranges
+    vm.stopPrank();
+
+    vm.startPrank(deployer);
+    lm.deposit(fId, range3Id, _toArray(nftId2), rahoz); // active range
+    vm.stopPrank();
+
+    vm.warp(endTime);
+
+    vm.startPrank(jensen);
+    lm.withdraw(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    vm.startPrank(rahoz);
+    lm.withdraw(fId, _toArray(nftId2));
+    vm.stopPrank();
+
+    uint256 rewardJensenPeriod1 = _calcReward(7 days, rewardAmount, nftIdLiq, 30 days, nftIdLiq);
+    uint256 rewardJensenPeriod2 = _calcReward(
+      23 days,
+      rewardAmount - rewardJensenPeriod1,
+      nftIdLiq * 2,
+      23 days,
+      nftIdLiq * 2 + nftId2Liq * 3
+    );
+    uint256 rewardRahozPeriod2 = _calcReward(
+      23 days,
+      rewardAmount - rewardJensenPeriod1,
+      nftId2Liq * 3,
+      23 days,
+      nftIdLiq * 2 + nftId2Liq * 3
+    );
+
+    assertApproxEqAbs(knc.balanceOf(jensen), rewardJensenPeriod1 + rewardJensenPeriod2, 10);
+    assertApproxEqAbs(knc.balanceOf(rahoz), rewardRahozPeriod2, 10);
+  }
+
+  function test_RemoveRangeAndActiveAgain() public {
+    uint256 rangeId = 0;
+
+    vm.startPrank(deployer);
+    lm.deposit(fId, rangeId, _toArray(nftId), jensen);
+    vm.stopPrank();
+
+    vm.startPrank(deployer);
+    lm.deposit(fId, rangeId, _toArray(nftId2), rahoz);
+    vm.stopPrank();
+
+    vm.warp(startTime + 2 days);
+
+    // remove range
+    vm.startPrank(deployer);
+    lm.removeRange(fId, rangeId);
+    vm.stopPrank();
+
+    vm.startPrank(jensen);
+    lm.withdraw(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    vm.warp(startTime + 4 days);
+
+    vm.startPrank(deployer);
+    lm.activateRange(fId, rangeId);
+    vm.stopPrank();
+
+    vm.startPrank(jensen);
+    nft.setApprovalForAll(address(lm), true);
+    lm.deposit(fId, rangeId, _toArray(nftId), jensen);
+    vm.stopPrank();
+
+    vm.warp(endTime);
+
+    vm.startPrank(jensen);
+    lm.withdraw(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    vm.startPrank(rahoz);
+    lm.withdraw(fId, _toArray(nftId2));
+    vm.stopPrank();
+
+    uint256 rewardJensenPeriod1 = _calcReward(
+      2 days,
+      rewardAmount,
+      nftIdLiq,
+      30 days,
+      nftIdLiq + nftId2Liq
+    );
+
+    uint256 rewardRahozPeriod1 = _calcReward(
+      2 days,
+      rewardAmount,
+      nftId2Liq,
+      30 days,
+      nftIdLiq + nftId2Liq
+    );
+
+    uint256 rewardRahozPeriod2 = _calcReward(
+      2 days,
+      rewardAmount - rewardJensenPeriod1 - rewardRahozPeriod1,
+      nftId2Liq,
+      28 days,
+      nftId2Liq
+    );
+
+    uint256 rewardJensenPeriod3 = _calcReward(
+      26 days,
+      rewardAmount - rewardJensenPeriod1 - rewardRahozPeriod1 - rewardRahozPeriod2,
+      nftIdLiq,
+      26 days,
+      nftIdLiq + nftId2Liq
+    );
+
+    uint256 rewardRahozPeriod3 = _calcReward(
+      26 days,
+      rewardAmount - rewardJensenPeriod1 - rewardRahozPeriod1 - rewardRahozPeriod2,
+      nftId2Liq,
+      26 days,
+      nftIdLiq + nftId2Liq
+    );
+
+    assertApproxEqAbs(knc.balanceOf(jensen), rewardJensenPeriod1 + rewardJensenPeriod3, 10);
+    assertApproxEqAbs(
+      knc.balanceOf(rahoz),
+      rewardRahozPeriod1 + rewardRahozPeriod2 + rewardRahozPeriod3,
+      10
+    );
+  }
 }
