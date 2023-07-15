@@ -14,6 +14,7 @@ import {KyberSwapFarmingToken} from 'contracts/periphery/KyberSwapFarmingToken.s
 import {KSElasticLMV2} from 'contracts/KSElasticLMV2.sol';
 import {KSElasticLMHelper} from 'contracts/KSElasticLMHelper.sol';
 import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManagerV2.sol';
+import {MockToken} from 'contracts/mock/MockToken.sol';
 
 import {FoundryHelper} from '../helpers/FoundryHelper.sol';
 
@@ -991,5 +992,99 @@ contract ElasticV2 is FoundryHelper {
       rewardRahozPeriod1 + rewardRahozPeriod2 + rewardRahozPeriod3,
       10
     );
+  }
+
+  function test_FarmWithoutRewardsBySettingAmountToZero() public {
+    phase.rewards[0].rewardAmount = 0; // no rewards by setting rewardAmount to 0
+
+    vm.startPrank(deployer);
+    fId = lm.addFarm(wmaticUsdtPool, ranges, phase, true);
+    (, , , , address fToken, , ) = lm.getFarm(fId);
+    vm.stopPrank();
+
+    vm.startPrank(deployer);
+    lm.deposit(fId, 0, _toArray(nftId), jensen);
+    vm.stopPrank();
+
+    assertEq(IERC20(fToken).balanceOf(jensen), nftIdLiq);
+
+    vm.warp(startTime + 10 days);
+
+    vm.startPrank(jensen);
+    lm.claimReward(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    (, , , , , uint256[] memory sumRewardPerLiquidity, uint32 lastTouchedTime) = lm.getFarm(fId);
+
+    assertEq(sumRewardPerLiquidity[0], 0); // no rewards
+    assertEq(lastTouchedTime, startTime + 10 days);
+
+    assertEq(knc.balanceOf(jensen), 0); // no rewards
+    assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
+
+    vm.warp(endTime);
+
+    vm.startPrank(jensen);
+    lm.withdraw(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    (, , , , , sumRewardPerLiquidity, lastTouchedTime) = lm.getFarm(fId);
+
+    assertEq(sumRewardPerLiquidity[0], 0); // no rewards
+    assertEq(lastTouchedTime, endTime);
+
+    assertEq(IERC20(fToken).balanceOf(jensen), 0);
+    assertEq(knc.balanceOf(jensen), 0); // no rewards
+    assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
+  }
+
+  function test_FarmWithoutRewardsBySettingRewardAsDummyToken() public {
+    vm.startPrank(deployer);
+    MockToken mockToken = new MockToken('MockToken', 'MTK', rewardAmount);
+    mockToken.transfer(address(lm), rewardAmount);
+    vm.stopPrank();
+
+    phase.rewards[0].rewardToken = address(mockToken);
+    phase.rewards[0].rewardAmount = rewardAmount;
+
+    vm.startPrank(deployer);
+    fId = lm.addFarm(wmaticUsdtPool, ranges, phase, true);
+    (, , , , address fToken, , ) = lm.getFarm(fId);
+    vm.stopPrank();
+
+    vm.startPrank(deployer);
+    lm.deposit(fId, 0, _toArray(nftId), jensen);
+    vm.stopPrank();
+
+    assertEq(IERC20(fToken).balanceOf(jensen), nftIdLiq);
+
+    vm.warp(startTime + 10 days);
+
+    vm.startPrank(jensen);
+    lm.claimReward(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    (, , , , , uint256[] memory sumRewardPerLiquidity, uint32 lastTouchedTime) = lm.getFarm(fId);
+
+    assertEq(sumRewardPerLiquidity[0], 95295532410948729373596749); // calculate manually
+    assertEq(lastTouchedTime, startTime + 10 days);
+
+    assertApproxEqAbs(mockToken.balanceOf(jensen), (rewardAmount * 10) / 30, 10); // have rewards but just dummy tokens
+    assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
+
+    vm.warp(endTime);
+
+    vm.startPrank(jensen);
+    lm.withdraw(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    (, , , , , sumRewardPerLiquidity, lastTouchedTime) = lm.getFarm(fId);
+
+    assertEq(sumRewardPerLiquidity[0], 285886597232846188120790248); // calculate manually
+    assertEq(lastTouchedTime, endTime);
+
+    assertEq(IERC20(fToken).balanceOf(jensen), 0);
+    assertApproxEqAbs(mockToken.balanceOf(jensen), rewardAmount, 10); // have rewards but just dummy tokens
+    assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
   }
 }
