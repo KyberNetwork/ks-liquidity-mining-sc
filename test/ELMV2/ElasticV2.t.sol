@@ -1038,6 +1038,51 @@ contract ElasticV2 is FoundryHelper {
     assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
   }
 
+  function test_FarmWithoutRewardsBySettingETHAmountToZero() public {
+    phase.rewards[0].rewardToken = ETH_ADDRESS;
+    phase.rewards[0].rewardAmount = 0; // no rewards by setting rewardAmount to 0
+
+    vm.startPrank(deployer);
+    fId = lm.addFarm(wmaticUsdtPool, ranges, phase, true);
+    (, , , , address fToken, , ) = lm.getFarm(fId);
+    vm.stopPrank();
+
+    vm.startPrank(deployer);
+    lm.deposit(fId, 0, _toArray(nftId), jensen);
+    vm.stopPrank();
+
+    assertEq(IERC20(fToken).balanceOf(jensen), nftIdLiq);
+
+    vm.warp(startTime + 10 days);
+
+    vm.startPrank(jensen);
+    lm.claimReward(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    (, , , , , uint256[] memory sumRewardPerLiquidity, uint32 lastTouchedTime) = lm.getFarm(fId);
+
+    assertEq(sumRewardPerLiquidity[0], 0); // no rewards
+    assertEq(lastTouchedTime, startTime + 10 days);
+
+    assertEq(knc.balanceOf(jensen), 0); // no rewards
+    assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
+
+    vm.warp(endTime);
+
+    vm.startPrank(jensen);
+    lm.withdraw(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    (, , , , , sumRewardPerLiquidity, lastTouchedTime) = lm.getFarm(fId);
+
+    assertEq(sumRewardPerLiquidity[0], 0); // no rewards
+    assertEq(lastTouchedTime, endTime);
+
+    assertEq(IERC20(fToken).balanceOf(jensen), 0);
+    assertEq(knc.balanceOf(jensen), 0); // no rewards
+    assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
+  }
+
   function test_FarmWithoutRewardsBySettingRewardAsDummyToken() public {
     vm.startPrank(deployer);
     MockToken mockToken = new MockToken('MockToken', 'MTK', rewardAmount);
