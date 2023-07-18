@@ -17,7 +17,7 @@ import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManagerV2.
 
 import {FoundryHelper} from '../helpers/FoundryHelper.sol';
 
-contract ElasticV2 is FoundryHelper {
+contract WithoutToken is FoundryHelper {
   using SafeERC20 for IERC20;
 
   string POLYGON_NODE_URL = vm.envString('POLYGON_NODE_URL');
@@ -346,5 +346,45 @@ contract ElasticV2 is FoundryHelper {
 
     // this number is returned by calling directly to nft
     assertEq(balanceAfter - balanceBefore, 25520262129608130);
+  }
+
+  function testWithoutRewards() public {
+    phase.rewards[0].rewardAmount = 0; // no rewards by setting rewardAmount to 0
+
+    vm.startPrank(deployer);
+    fId = lm.addFarm(wmaticUsdtPool, ranges, phase, false);
+    vm.stopPrank();
+
+    vm.startPrank(deployer);
+    lm.deposit(fId, 0, _toArray(nftId), jensen);
+    vm.stopPrank();
+
+    vm.warp(startTime + 10 days);
+
+    vm.startPrank(jensen);
+    lm.claimReward(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    (, , , , , uint256[] memory sumRewardPerLiquidity, uint32 lastTouchedTime) = lm.getFarm(fId);
+
+    assertEq(sumRewardPerLiquidity[0], 0); // no rewards
+    assertEq(lastTouchedTime, startTime + 10 days);
+
+    assertEq(knc.balanceOf(jensen), 0); // no rewards
+    assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
+
+    vm.warp(endTime);
+
+    vm.startPrank(jensen);
+    lm.withdraw(fId, _toArray(nftId));
+    vm.stopPrank();
+
+    (, , , , , sumRewardPerLiquidity, lastTouchedTime) = lm.getFarm(fId);
+
+    assertEq(sumRewardPerLiquidity[0], 0); // no rewards
+    assertEq(lastTouchedTime, endTime);
+
+    assertEq(knc.balanceOf(jensen), 0); // no rewards
+    assertEq(knc.balanceOf(address(lm)), rewardAmount); // reward balance of farm still the same
   }
 }
