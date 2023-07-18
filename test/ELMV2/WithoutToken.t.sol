@@ -120,7 +120,7 @@ contract WithoutToken is FoundryHelper {
     ranges.push(IKSElasticLMV2.RangeInput({tickLower: -280000, tickUpper: -270000, weight: 2}));
 
     vm.startPrank(deployer);
-    fId = lm.addFarm(wmaticUsdtPool, ranges, phase, false);
+    fId = lm.addFarm(wmaticUsdtPool, ranges, phase, false); // set to false to not using farmingToken
     vm.stopPrank();
 
     vm.label(address(wmatic), 'WMATIC');
@@ -352,7 +352,7 @@ contract WithoutToken is FoundryHelper {
     phase.rewards[0].rewardAmount = 0; // no rewards by setting rewardAmount to 0
 
     vm.startPrank(deployer);
-    fId = lm.addFarm(wmaticUsdtPool, ranges, phase, false);
+    fId = lm.addFarm(wmaticUsdtPool, ranges, phase, false); // set to false to not using farmingToken
     vm.stopPrank();
 
     vm.startPrank(deployer);
