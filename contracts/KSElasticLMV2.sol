@@ -612,10 +612,12 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     address farmingToken = farms[fId].farmingToken;
 
     //mint/burn farmingToken base on the difference between newLiq/curLiq. there is no case that newLiq == curLiq
-    if (newLiq > curLiq) {
-      _mintFarmingToken(farmingToken, receiver, newLiq - curLiq);
-    } else {
-      _burnFarmingToken(farmingToken, receiver, curLiq - newLiq);
+    if (farmingToken != address(0)) {
+      if (newLiq > curLiq) {
+        _mintFarmingToken(farmingToken, receiver, newLiq - curLiq);
+      } else {
+        _burnFarmingToken(farmingToken, receiver, curLiq - newLiq);
+      }
     }
 
     //update stake liquidity, farm total liquidity
