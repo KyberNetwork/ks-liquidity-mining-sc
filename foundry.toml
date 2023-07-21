@@ -22,7 +22,7 @@ number_underscore = "thousands"
 quote_style = "single"
 
 [rpc_endpoints]
-mainnet = "https://cloudflare-eth.com"
+mainnet = "https://eth.llamarpc.com"
 goerli = "https://eth-goerli.public.blastapi.io"
 sepolia = "https://eth-sepolia.public.blastapi.io"
 polygon = "https://polygon.kyberengineering.io"
@@ -30,6 +30,7 @@ bsc = "https://bsc.kyberengineering.io"
 arb = "https://rpc.ankr.com/arbitrum"
 op = "https://optimism.meowrpc.com"
 avax = "https://avax.meowrpc.com"
+lineamain = "https://linea-mainnet.infura.io/v3/474d88f0f3bc480b900b6b7a630855b6"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_KEY}" }
