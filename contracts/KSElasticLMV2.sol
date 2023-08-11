@@ -348,7 +348,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     //update farm total liquidity
     farms[fId].liquidity -= totalLiq;
 
-    //burn an a mount of farmingToken from msg.sender
+    //burn an amount of farmingToken from msg.sender
     if (farms[fId].farmingToken != address(0))
       _burnFarmingToken(farms[fId].farmingToken, msg.sender, totalLiq);
 
@@ -689,47 +689,51 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     uint256 length = farms[fId].phase.rewards.length;
     curSumRewardPerLiquidity = new uint256[](length);
 
-    uint32 lastTouchedTime = farms[fId].lastTouchedTime;
     uint32 endTime = farms[fId].phase.endTime;
     bool isSettled = farms[fId].phase.isSettled;
-    uint256 liquidity = farms[fId].liquidity;
 
-    if (block.timestamp > lastTouchedTime) {
-      for (uint256 i; i < length; ) {
-        curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
-        uint256 deltaSumRewardPerLiquidity;
+    //save gas for case farm do not have any rewards
+    if (length != 0) {
+      uint32 lastTouchedTime = farms[fId].lastTouchedTime;
+      uint256 liquidity = farms[fId].liquidity;
 
-        //calculate deltaSumReward incase there is any liquidity in farm and farm is not settled yet
-        if (liquidity > 0 && !isSettled) {
-          deltaSumRewardPerLiquidity = _calcDeltaSumRewardPerLiquidity(
-            farms[fId].phase.rewards[i].rewardAmount,
-            farms[fId].phase.startTime,
-            endTime,
-            lastTouchedTime,
-            liquidity
-          );
+      if (block.timestamp > lastTouchedTime) {
+        for (uint256 i; i < length; ) {
+          curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
+          uint256 deltaSumRewardPerLiquidity;
+
+          //calculate deltaSumReward incase there is any liquidity in farm and farm is not settled yet
+          if (liquidity > 0 && !isSettled) {
+            deltaSumRewardPerLiquidity = _calcDeltaSumRewardPerLiquidity(
+              farms[fId].phase.rewards[i].rewardAmount,
+              farms[fId].phase.startTime,
+              endTime,
+              lastTouchedTime,
+              liquidity
+            );
+          }
+
+          if (deltaSumRewardPerLiquidity != 0) {
+            farms[fId].sumRewardPerLiquidity[i] =
+              curSumRewardPerLiquidity[i] +
+              deltaSumRewardPerLiquidity;
+
+            curSumRewardPerLiquidity[i] += deltaSumRewardPerLiquidity;
+          }
+
+          unchecked {
+            ++i;
+          }
         }
 
-        if (deltaSumRewardPerLiquidity != 0) {
-          farms[fId].sumRewardPerLiquidity[i] =
-            curSumRewardPerLiquidity[i] +
-            deltaSumRewardPerLiquidity;
+        farms[fId].lastTouchedTime = uint32(block.timestamp);
+      } else {
+        for (uint256 i; i < length; ) {
+          curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
 
-          curSumRewardPerLiquidity[i] += deltaSumRewardPerLiquidity;
-        }
-
-        unchecked {
-          ++i;
-        }
-      }
-
-      farms[fId].lastTouchedTime = uint32(block.timestamp);
-    } else {
-      for (uint256 i; i < length; ) {
-        curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
-
-        unchecked {
-          ++i;
+          unchecked {
+            ++i;
+          }
         }
       }
     }
@@ -885,8 +889,6 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
   function _isPhaseValid(PhaseInput memory phase) internal view {
     if (phase.startTime < block.timestamp || phase.endTime <= phase.startTime)
       revert InvalidTime();
-
-    if (phase.rewards.length == 0) revert InvalidReward();
   }
 
   /// @dev check if add liquidity conditions are meet or not, revert on fail
