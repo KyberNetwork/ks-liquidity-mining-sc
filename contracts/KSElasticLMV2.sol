@@ -729,7 +729,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
       }
       //if there is no rewards then sumRewardPerLiquidity should be 0 and we do not have calculate it
 
-      //store the new timestamp
+      //store the new timestamp for both cases, even for no rewards farm bc we still need to track farm's state
       farms[fId].lastTouchedTime = uint32(block.timestamp);
     } else {
       // if time is the same then we just read from storage
