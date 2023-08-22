@@ -403,10 +403,19 @@ contract EmptyRewards is FoundryHelper {
     assertEq(nft.ownerOf(nftId), jensen);
     assertEq(nft.ownerOf(nftId2), rahoz);
 
-    (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = lm.getFarm(fId);
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = lm.getFarm(fId);
 
     assertEq(liquidity, 0);
     assertEq(sumRewardPerLiquidity.length, 0);
+    assertEq(lastTouchedTime, endTime + 11 days); // lastTouchedTime should be updated correctly
     assertEq(knc.balanceOf(address(lm)), rewardAmount); // do not lose any rewards
   }
 
@@ -442,10 +451,19 @@ contract EmptyRewards is FoundryHelper {
     assertEq(nft.ownerOf(nftId), jensen);
     assertEq(nft.ownerOf(nftId2), rahoz);
 
-    (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = lm.getFarm(fId);
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = lm.getFarm(fId);
 
     assertEq(liquidity, 0);
     assertEq(sumRewardPerLiquidity.length, 0);
+    assertEq(lastTouchedTime, endTime); // lastTouchedTime should be updated correctly
     assertEq(knc.balanceOf(address(lm)), rewardAmount); // do not lose any rewards
   }
 
@@ -503,10 +521,19 @@ contract EmptyRewards is FoundryHelper {
     assertEq(nft.ownerOf(nftId), jensen);
     assertEq(nft.ownerOf(nftId2), rahoz);
 
-    (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = lm.getFarm(fId);
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = lm.getFarm(fId);
 
     assertEq(liquidity, 0);
     assertEq(sumRewardPerLiquidity.length, 0);
+    assertEq(lastTouchedTime, endTime); // lastTouchedTime should be updated correctly
     assertEq(knc.balanceOf(address(lm)), rewardAmount); // do not lose any rewards
   }
 
@@ -551,10 +578,19 @@ contract EmptyRewards is FoundryHelper {
     assertEq(nft.ownerOf(nftId), jensen);
     assertEq(nft.ownerOf(nftId2), rahoz);
 
-    (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = lm.getFarm(fId);
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = lm.getFarm(fId);
 
     assertEq(liquidity, 0);
     assertEq(sumRewardPerLiquidity.length, 0);
+    assertEq(lastTouchedTime, endTime); // lastTouchedTime should be updated correctly
     assertEq(knc.balanceOf(address(lm)), rewardAmount); // do not lose any rewards
   }
 
@@ -614,10 +650,19 @@ contract EmptyRewards is FoundryHelper {
     assertEq(nft.ownerOf(nftId), jensen);
     assertEq(nft.ownerOf(nftId2), rahoz);
 
-    (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = lm.getFarm(fId);
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = lm.getFarm(fId);
 
     assertEq(liquidity, 0);
     assertEq(sumRewardPerLiquidity.length, 0);
+    assertEq(lastTouchedTime, endTime); // lastTouchedTime should be updated correctly
     assertEq(knc.balanceOf(address(lm)), rewardAmount); // do not lose any rewards
   }
 
@@ -665,10 +710,19 @@ contract EmptyRewards is FoundryHelper {
     assertEq(nft.ownerOf(nftId), jensen);
     assertEq(nft.ownerOf(nftId2), rahoz);
 
-    (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = lm.getFarm(fId);
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = lm.getFarm(fId);
 
     assertEq(liquidity, 0);
     assertEq(sumRewardPerLiquidity.length, 0);
+    assertEq(lastTouchedTime, startTime + 21 days); // lastTouchedTime should be updated correctly
     assertEq(knc.balanceOf(address(lm)), rewardAmount);
   }
 
@@ -705,10 +759,19 @@ contract EmptyRewards is FoundryHelper {
     assertEq(nft.ownerOf(nftId), jensen);
     assertEq(nft.ownerOf(nftId2), rahoz);
 
-    (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = lm.getFarm(fId);
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = lm.getFarm(fId);
 
     assertEq(liquidity, 0);
     assertEq(sumRewardPerLiquidity.length, 0);
+    assertEq(lastTouchedTime, endTime); // lastTouchedTime should be updated correctly
     assertEq(knc.balanceOf(address(lm)), rewardAmount); // do not lose any rewards
   }
 
@@ -803,10 +866,20 @@ contract EmptyRewards is FoundryHelper {
     assertEq(nft.ownerOf(nftId), jensen);
     assertEq(nft.ownerOf(nftId2), rahoz);
 
-    (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = lm.getFarm(fId);
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = lm.getFarm(fId);
 
     assertEq(liquidity, 0);
     assertEq(sumRewardPerLiquidity.length, 0);
+    assertEq(lastTouchedTime, endTime); // lastTouchedTime should be updated correctly
+
     assertEq(knc.balanceOf(address(lm)), rewardAmount); // do not lose any rewards
   }
 }

@@ -691,13 +691,14 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
 
     uint32 endTime = farms[fId].phase.endTime;
     bool isSettled = farms[fId].phase.isSettled;
+    uint32 lastTouchedTime = farms[fId].lastTouchedTime;
 
-    //save gas for case farm do not have any rewards
-    if (length != 0) {
-      uint32 lastTouchedTime = farms[fId].lastTouchedTime;
-      uint256 liquidity = farms[fId].liquidity;
+    //if some time has passed then we calculating new sumRewardPerLiquidity
+    if (block.timestamp > lastTouchedTime) {
+      //if there is rewards then we continue to calculating new sumRewardPerLiquidity
+      if (length != 0) {
+        uint256 liquidity = farms[fId].liquidity;
 
-      if (block.timestamp > lastTouchedTime) {
         for (uint256 i; i < length; ) {
           curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
           uint256 deltaSumRewardPerLiquidity;
@@ -725,15 +726,18 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
             ++i;
           }
         }
+      }
+      //if there is no rewards then sumRewardPerLiquidity should be 0 and we do not have calculate it
 
-        farms[fId].lastTouchedTime = uint32(block.timestamp);
-      } else {
-        for (uint256 i; i < length; ) {
-          curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
+      //store the new timestamp for both cases, even for no rewards farm bc we still need to track farm's state
+      farms[fId].lastTouchedTime = uint32(block.timestamp);
+    } else {
+      // if time is the same then we just read from storage
+      for (uint256 i; i < length; ) {
+        curSumRewardPerLiquidity[i] = farms[fId].sumRewardPerLiquidity[i];
 
-          unchecked {
-            ++i;
-          }
+        unchecked {
+          ++i;
         }
       }
     }
