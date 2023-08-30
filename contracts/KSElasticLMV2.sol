@@ -19,6 +19,10 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
   using EnumerableSet for EnumerableSet.UintSet;
 
   address private constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
+  uint256 private constant IS_CLAIM_FEE = 0x08;
+  uint256 private constant IS_SYNC_FEE = 0x04;
+  uint256 private constant IS_CLAIM_REWARD = 0x02;
+  uint256 private constant IS_RECEIVE_NATIVE = 0x01;
 
   IERC721 private immutable nft;
   IKSElasticLMHelper private helper;
@@ -390,8 +394,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     uint256 amount0Min,
     uint256 amount1Min,
     uint256 deadline,
-    bool isClaimFee,
-    bool isReceiveNative
+    uint8 flags
   ) external override nonReentrant {
     if (block.timestamp > deadline) revert Expired();
     if (stakes[nftId].owner != msg.sender) revert NotOwner();
@@ -402,20 +405,44 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
 
     //call to posManager to remove liquidity for position, also claim lp fee if needed
     _removeLiquidity(nftId, liquidity, deadline);
-    if (isClaimFee) _claimFee(nftId, deadline, false);
+    if (_checkFlags(IS_CLAIM_FEE, flags)) _claimFee(nftId, deadline, false);
 
     //calculate new liquidity after remove
     posLiq = posLiq - liquidity;
 
     uint256 fId = stakes[nftId].fId;
-    uint256 curLiq = stakes[nftId].liquidity;
     uint256 newLiq = posLiq * farms[fId].ranges[stakes[nftId].rangeId].weight;
 
     //update liquidity if new liquidity < cur liquidity, ignore case where new liquidity >= cur liquidity
-    if (newLiq < curLiq) _updateLiquidity(fId, nftId, newLiq, msg.sender);
+    if (newLiq < stakes[nftId].liquidity) _updateLiquidity(fId, nftId, newLiq, msg.sender);
 
     //transfer tokens from posManager to user
-    _transferTokens(farms[fId].poolAddress, amount0Min, amount1Min, msg.sender, isReceiveNative);
+    _transferTokens(
+      farms[fId].poolAddress,
+      amount0Min,
+      amount1Min,
+      msg.sender,
+      _checkFlags(IS_RECEIVE_NATIVE, flags)
+    );
+
+    if (_checkFlags(IS_CLAIM_REWARD, flags)) {
+      uint256 rewardLength = farms[fId].phase.rewards.length;
+      for (uint256 i; i < rewardLength; ) {
+        address token = farms[fId].phase.rewards[i].rewardToken;
+        uint256 rewardAmount = stakes[nftId].rewardUnclaimed[i];
+
+        if (rewardAmount != 0) {
+          stakes[nftId].rewardUnclaimed[i] = 0;
+          _safeTransfer(token, msg.sender, rewardAmount);
+        }
+
+        emit ClaimReward(fId, nftId, token, rewardAmount, msg.sender);
+
+        unchecked {
+          ++i;
+        }
+      }
+    }
   }
 
   /// @inheritdoc IKSElasticLMV2
@@ -425,16 +452,19 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     uint256 amount0Min,
     uint256 amount1Min,
     uint256 deadline,
-    bool isReceiveNative
+    uint8 flags
   ) external override nonReentrant {
     if (block.timestamp > deadline) revert Expired();
+
+    bool isSyncFee = _checkFlags(IS_SYNC_FEE, flags);
+    bool isReceiveNative = _checkFlags(IS_RECEIVE_NATIVE, flags);
 
     uint256 length = nftIds.length;
     for (uint256 i; i < length; ) {
       _isStakeValid(fId, nftIds[i]);
 
       //call to posManager to claim fee
-      _claimFee(nftIds[i], deadline, true);
+      _claimFee(nftIds[i], deadline, isSyncFee);
 
       unchecked {
         ++i;
@@ -926,5 +956,12 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
   ) internal view {
     _isStakeValid(fId, nftId);
     if (stakes[nftId].rangeId != rangeId) revert RangeNotMatch();
+  }
+
+  /// @notice Returns a boolean for checking a flag match.
+  /// @param flagConstant A flag constant is defined in this contract.
+  /// @param flags Check whether flags match the flagConstant or not.
+  function _checkFlags(uint256 flagConstant, uint256 flags) internal pure returns (bool) {
+    return flagConstant & flags != 0;
   }
 }

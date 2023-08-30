@@ -177,6 +177,19 @@ contract ElasticV2 is FoundryHelper {
     amount = (joinedDuration * reward * liq) / (duration * totalLiq);
   }
 
+  function _buildFlags(
+    bool isClaimFee,
+    bool isSyncFee,
+    bool isClaimReward,
+    bool isReceiveNative
+  ) internal pure returns (uint8 flags) {
+    if (isReceiveNative) flags = 1;
+
+    if (isClaimFee) flags = flags | (1 << 3);
+    if (isSyncFee) flags = flags | (1 << 2);
+    if (isClaimReward) flags = flags | (1 << 1);
+  }
+
   function testSetUp() public virtual {
     assertEq(address(lm.getNft()), address(nft));
 
@@ -320,7 +333,14 @@ contract ElasticV2 is FoundryHelper {
     _addLiquidity(nftId, 1 ether, 1 wei);
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, UINT256_MAX, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      UINT256_MAX,
+      _buildFlags(false, true, false, false)
+    );
     vm.stopPrank();
 
     (
@@ -353,7 +373,7 @@ contract ElasticV2 is FoundryHelper {
     uint256 balanceBefore = payable(jensen).balance;
 
     vm.startPrank(jensen);
-    lm.claimFee(fId, nftIds, 0, 0, UINT256_MAX, true);
+    lm.claimFee(fId, nftIds, 0, 0, UINT256_MAX, _buildFlags(false, true, false, true));
     vm.stopPrank();
 
     uint256 balanceAfter = payable(jensen).balance;

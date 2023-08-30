@@ -118,7 +118,7 @@ contract ClaimFee is Base {
     uint256 balanceUsdtBefore = mockUsdt.balanceOf(rahoz);
 
     vm.startPrank(rahoz);
-    lm.claimFee(fId, nftIds, 0, 0, endTime, false);
+    lm.claimFee(fId, nftIds, 0, 0, endTime, _buildFlags(false, true, false, false));
     vm.stopPrank();
 
     uint256 balanceUsdcAfter = mockUsdc.balanceOf(rahoz);
@@ -145,7 +145,7 @@ contract ClaimFee is Base {
 
     vm.startPrank(rahoz);
     vm.expectRevert(abi.encodeWithSignature('StakeNotFound()'));
-    lm.claimFee(fId, nftIds, 0, 0, endTime, false);
+    lm.claimFee(fId, nftIds, 0, 0, endTime, _buildFlags(false, false, false, false));
     vm.stopPrank();
   }
 
@@ -162,7 +162,7 @@ contract ClaimFee is Base {
 
     vm.startPrank(rahoz);
     vm.expectRevert(abi.encodeWithSignature('NotOwner()'));
-    lm.claimFee(fId, nftIds, 0, 0, endTime, false);
+    lm.claimFee(fId, nftIds, 0, 0, endTime, _buildFlags(false, false, false, false));
     vm.stopPrank();
   }
 }
