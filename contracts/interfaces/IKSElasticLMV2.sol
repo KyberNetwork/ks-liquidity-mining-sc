@@ -57,9 +57,15 @@ interface IKSElasticLMV2 {
   event UpdateLiquidity(uint256 indexed fId, uint256 nftId, uint256 liquidity);
   event Withdraw(uint256[] nftIds, address receiver);
   event WithdrawEmergency(uint256 nftId, address receiver);
-  event ClaimReward(uint256 fId, uint256 nftId, address token, uint256 amount, address receiver);
   event ClaimReward(
-    uint256 fId,
+    uint256 indexed fId,
+    uint256 nftId,
+    address token,
+    uint256 amount,
+    address receiver
+  );
+  event ClaimReward(
+    uint256 indexed fId,
     uint256[] nftIds,
     address token,
     uint256 amount,
