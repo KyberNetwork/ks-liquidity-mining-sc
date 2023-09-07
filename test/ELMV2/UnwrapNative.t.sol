@@ -115,7 +115,14 @@ contract UnwrapNative is Base {
     uint256 balanceBefore = payable(jensen).balance;
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId, nftLiq, 0, 0, block.timestamp + 3600, false, true);
+    lm.removeLiquidity(
+      nftId,
+      nftLiq,
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, true)
+    );
     vm.stopPrank();
 
     uint256 balanceAfter = payable(jensen).balance;
@@ -127,7 +134,14 @@ contract UnwrapNative is Base {
     uint256 balanceBefore = payable(jensen).balance;
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId, nftLiq / 2, 0, 0, block.timestamp + 3600, false, true);
+    lm.removeLiquidity(
+      nftId,
+      nftLiq / 2,
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, true)
+    );
     vm.stopPrank();
 
     uint256 balanceAfter = payable(jensen).balance;
@@ -139,7 +153,14 @@ contract UnwrapNative is Base {
     uint256 balanceBefore = payable(jensen).balance;
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId, nftLiq, 0, 0, block.timestamp + 3600, true, true);
+    lm.removeLiquidity(
+      nftId,
+      nftLiq,
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(true, false, false, true)
+    );
     vm.stopPrank();
 
     uint256 balanceAfter = payable(jensen).balance;
@@ -151,7 +172,14 @@ contract UnwrapNative is Base {
     uint256 balanceBefore = payable(jensen).balance;
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId2, nft2Liq, 0, 0, block.timestamp + 3600, false, true);
+    lm.removeLiquidity(
+      nftId2,
+      nft2Liq,
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, true)
+    );
     vm.stopPrank();
 
     uint256 balanceAfter = payable(jensen).balance;
@@ -163,7 +191,14 @@ contract UnwrapNative is Base {
     uint256 balanceBefore = payable(jensen).balance;
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId2, nft2Liq, 0, 0, block.timestamp + 3600, true, true);
+    lm.removeLiquidity(
+      nftId2,
+      nft2Liq,
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(true, false, false, true)
+    );
     vm.stopPrank();
 
     uint256 balanceAfter = payable(jensen).balance;

@@ -58,7 +58,14 @@ interface IKSElasticLMV2 {
   event Withdraw(uint256[] nftIds, address receiver);
   event WithdrawEmergency(uint256 nftId, address receiver);
   event ClaimReward(
-    uint256 fId,
+    uint256 indexed fId,
+    uint256 nftId,
+    address token,
+    uint256 amount,
+    address receiver
+  );
+  event ClaimReward(
+    uint256 indexed fId,
     uint256[] nftIds,
     address token,
     uint256 amount,
@@ -161,15 +168,14 @@ interface IKSElasticLMV2 {
   /// @param amount0Min min amount of token0 should receive
   /// @param amount1Min min amount of token1 should receive
   /// @param deadline deadline of remove liquidity tx
-  /// @param isClaimFee is also burnRTokens or not
+  /// @param flags (4 bits unused, 1 bit for isClaimFee, 1 bit unused, 1 bit for isClaimReward, 1 bit for isReceiveNative)
   function removeLiquidity(
     uint256 nftId,
     uint128 liquidity,
     uint256 amount0Min,
     uint256 amount1Min,
     uint256 deadline,
-    bool isClaimFee,
-    bool isReceiveNative
+    uint8 flags
   ) external;
 
   /// @dev claim fee from Elastic Pool
@@ -179,13 +185,14 @@ interface IKSElasticLMV2 {
   /// @param amount0Min min amount of token0 should receive
   /// @param amount1Min min amount of token1 should receive
   /// @param deadline deadline of remove liquidity tx
+  /// @param flags (4 bits unused, 1 bit for isClaimFee, 1 bit for isSyncFee, 2 bits unused)
   function claimFee(
     uint256 fId,
     uint256[] calldata nftIds,
     uint256 amount0Min,
     uint256 amount1Min,
     uint256 deadline,
-    bool isReceiveNative
+    uint8 flags
   ) external;
 
   /// @dev withdraw nfts in case emergency

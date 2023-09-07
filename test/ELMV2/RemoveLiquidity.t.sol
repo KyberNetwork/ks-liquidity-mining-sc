@@ -78,7 +78,14 @@ contract RemoveLiquidity is Base {
     liquidities[0] = 1;
 
     vm.startPrank(rahoz);
-    lm.removeLiquidity(nfts[0], liquidities[0], 0, 0, block.timestamp + 3600, true, false);
+    lm.removeLiquidity(
+      nfts[0],
+      liquidities[0],
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(true, false, false, false)
+    );
     vm.stopPrank();
 
     uint256 balanceUsdcAfter = usdc.balanceOf(rahoz);
@@ -104,7 +111,14 @@ contract RemoveLiquidity is Base {
     vm.stopPrank();
 
     vm.startPrank(rahoz);
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, block.timestamp + 3600, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false)
+    );
     vm.stopPrank();
 
     uint256 balanceUsdcAfter = usdc.balanceOf(rahoz);
@@ -129,7 +143,14 @@ contract RemoveLiquidity is Base {
     vm.stopPrank();
 
     vm.startPrank(rahoz);
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, block.timestamp + 3600, true, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(true, false, false, false)
+    );
     vm.stopPrank();
 
     uint256 balanceUsdcAfter = usdc.balanceOf(rahoz);
@@ -175,7 +196,14 @@ contract RemoveLiquidity is Base {
     uint256 balanceUsdtBefore = usdt.balanceOf(rahoz);
 
     vm.startPrank(rahoz);
-    lm.removeLiquidity(nftId, liqDelta - 1, 0, 0, block.timestamp + 3600, false, false);
+    lm.removeLiquidity(
+      nftId,
+      liqDelta - 1,
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false)
+    );
     vm.stopPrank();
 
     uint256 balanceUsdcAfter = usdc.balanceOf(rahoz);
@@ -220,7 +248,14 @@ contract RemoveLiquidity is Base {
     uint256 balanceUsdtBefore = usdt.balanceOf(rahoz);
 
     vm.startPrank(rahoz);
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, block.timestamp + 3600, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false)
+    );
     vm.stopPrank();
 
     uint256 balanceUsdcAfter = usdc.balanceOf(rahoz);
@@ -247,7 +282,14 @@ contract RemoveLiquidity is Base {
 
     vm.startPrank(rahoz); // wrong owner
     vm.expectRevert(abi.encodeWithSignature('NotOwner()'));
-    lm.removeLiquidity(nfts[0], liquidities[0], 0, 0, block.timestamp + 3600, true, false);
+    lm.removeLiquidity(
+      nfts[0],
+      liquidities[0],
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(true, false, false, false)
+    );
     vm.stopPrank();
   }
 
@@ -260,7 +302,14 @@ contract RemoveLiquidity is Base {
     nft.approve(address(lm), nftId);
     lm.deposit(fId, 1, nfts, deployer);
 
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, block.timestamp + 3600, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false)
+    );
 
     vm.warp(block.timestamp + 7 days);
 
@@ -282,7 +331,14 @@ contract RemoveLiquidity is Base {
     nft.approve(address(lm), nftId);
     lm.deposit(fId, 1, nfts, deployer);
 
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, block.timestamp + 3600, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false)
+    );
 
     _verifyStake(nftId, deployer, fId, 1, 0, 0, 0);
 
@@ -303,7 +359,14 @@ contract RemoveLiquidity is Base {
     nft.approve(address(lm), nftId);
     lm.deposit(fId, 1, nfts, deployer);
 
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, block.timestamp + 3600, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false)
+    );
 
     _verifyStake(nftId, deployer, fId, 1, 0, 0, 0);
 
@@ -327,7 +390,14 @@ contract RemoveLiquidity is Base {
     nft.approve(address(lm), nftId);
     lm.deposit(fId, 1, nfts, deployer);
 
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, block.timestamp + 3600, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false)
+    );
 
     _verifyStake(nftId, deployer, fId, 1, 0, 0, 0);
 
@@ -354,7 +424,14 @@ contract RemoveLiquidity is Base {
     nft.approve(address(lm), nftId);
     lm.deposit(fId, 1, nfts, deployer);
 
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, block.timestamp + 3600, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false)
+    );
 
     _verifyStake(nftId, deployer, fId, 1, 0, 0, 0);
 
@@ -393,7 +470,14 @@ contract RemoveLiquidity is Base {
       .positions(nftId);
 
     // remove all liq
-    lm.removeLiquidity(nftId, pos.liquidity, 0, 0, block.timestamp, true, false);
+    lm.removeLiquidity(
+      nftId,
+      pos.liquidity,
+      0,
+      0,
+      block.timestamp,
+      _buildFlags(true, false, false, false)
+    );
     _verifyStake(nftId, rahoz, fId, 0, 0, 0, 0);
 
     // add liq again
@@ -451,7 +535,14 @@ contract RemoveLiquidity is Base {
     vm.warp(startTime + 1 days);
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId2, uint128(nft2Liq), 0, 0, UINT256_MAX, false, false);
+    lm.removeLiquidity(
+      nftId2,
+      uint128(nft2Liq),
+      0,
+      0,
+      UINT256_MAX,
+      _buildFlags(false, false, false, false)
+    );
 
     uint256 deltaBalancJZ = usdc.balanceOf(jensen);
     nftIds = new uint256[](1);
@@ -501,6 +592,170 @@ contract RemoveLiquidity is Base {
       rewardNftId1AndNftId3Day1 + rewardNftId1AndNftId3Day2TillEndTime,
       10
     );
+  }
+
+  function testRemoveAllLiquidityAlsoClaimReward() public {
+    uint256 nftId = nftIds[2];
+
+    uint256[] memory nfts = new uint256[](1);
+    nfts[0] = nftId;
+
+    vm.startPrank(deployer);
+    nft.approve(address(lm), nftId);
+    lm.deposit(fId, 1, nfts, deployer);
+
+    uint256 nftLiq = _getLiq(nftId);
+    uint256 balanceBefore = usdc.balanceOf(deployer);
+
+    vm.warp(startTime + 10 days);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, true, false) // also claim reward
+    );
+
+    uint256 balanceAfter = usdc.balanceOf(deployer);
+    uint256 rewardShouldbe = _calculateRewardAmount(
+      10 days,
+      endTime - startTime,
+      nftLiq,
+      nftLiq,
+      rewardAmount
+    );
+
+    assertEq(balanceAfter - balanceBefore, rewardShouldbe + 5124844 /* remove liquidity amount */);
+
+    (, , , , , uint256[] memory rewardUnclaimeds) = lm.getStake(nftId);
+
+    //reward already claimed so there is no reward left
+    assertEq(rewardUnclaimeds[0], 0);
+    assertEq(rewardUnclaimeds[1], 0);
+  }
+
+  function testRemoveAllLiquidityNotClaimReward() public {
+    uint256 nftId = nftIds[2];
+
+    uint256[] memory nfts = new uint256[](1);
+    nfts[0] = nftId;
+
+    vm.startPrank(deployer);
+    nft.approve(address(lm), nftId);
+    lm.deposit(fId, 1, nfts, deployer);
+
+    uint256 nftLiq = _getLiq(nftId);
+    uint256 balanceBefore = usdc.balanceOf(deployer);
+
+    vm.warp(startTime + 10 days);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, false, false) // also claim reward
+    );
+
+    uint256 balanceAfter = usdc.balanceOf(deployer);
+    assertEq(balanceAfter - balanceBefore, 5124844 /* remove liquidity amount */);
+
+    (, , , , , uint256[] memory rewardUnclaimeds) = lm.getStake(nftId);
+    uint256 rewardShouldbe = _calculateRewardAmount(
+      10 days,
+      endTime - startTime,
+      nftLiq,
+      nftLiq,
+      rewardAmount
+    );
+
+    //reward already claimed so there is no reward left
+    assertEq(rewardUnclaimeds[0], rewardShouldbe);
+    assertEq(rewardUnclaimeds[1], rewardShouldbe);
+  }
+
+  function testRemoveAllLiquidityThenDeposit() public {
+    uint256 nftId = nftIds[2];
+
+    uint256[] memory nfts = new uint256[](1);
+    nfts[0] = nftId;
+
+    vm.startPrank(deployer);
+    nft.approve(address(lm), nftId);
+    lm.deposit(fId, 1, nfts, deployer);
+
+    uint256 nftLiq = _getLiq(nftId);
+    uint256 balanceBefore = usdc.balanceOf(deployer);
+
+    vm.warp(startTime + 10 days);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, true, false) // also claim reward
+    );
+
+    uint256 balanceAfter = usdc.balanceOf(deployer);
+    uint256 rewardShouldbe = _calculateRewardAmount(
+      10 days,
+      endTime - startTime,
+      nftLiq,
+      nftLiq,
+      rewardAmount
+    );
+
+    assertEq(balanceAfter - balanceBefore, rewardShouldbe + 5124844 /* remove liquidity amount */);
+
+    vm.warp(startTime + 20 days);
+
+    vm.expectRevert(abi.encodeWithSignature('PositionNotEligible()'));
+    lm.deposit(fId, 1, nfts, deployer);
+  }
+
+  function testRemoveAllLiquidityThenClaimReward() public {
+    uint256 nftId = nftIds[2];
+
+    uint256[] memory nfts = new uint256[](1);
+    nfts[0] = nftId;
+
+    vm.startPrank(deployer);
+    nft.approve(address(lm), nftId);
+    lm.deposit(fId, 1, nfts, deployer);
+
+    uint256 nftLiq = _getLiq(nftId);
+    uint256 balanceBefore = usdc.balanceOf(deployer);
+
+    vm.warp(startTime + 10 days);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      block.timestamp + 3600,
+      _buildFlags(false, false, true, false) // also claim reward
+    );
+
+    uint256 balanceAfter = usdc.balanceOf(deployer);
+    uint256 rewardShouldbe = _calculateRewardAmount(
+      10 days,
+      endTime - startTime,
+      nftLiq,
+      nftLiq,
+      rewardAmount
+    );
+
+    assertEq(balanceAfter - balanceBefore, rewardShouldbe + 5124844 /* remove liquidity amount */);
+
+    vm.warp(startTime + 20 days);
+
+    lm.claimReward(fId, nfts);
+
+    uint256 balanceFinal = usdc.balanceOf(deployer);
+
+    assertEq(balanceFinal - balanceAfter, 0 /* no more rewards because already claim all */);
   }
 
   function _mockElasticV2TestSetup()

@@ -167,6 +167,19 @@ contract EmptyRewards is FoundryHelper {
     amount = (joinedDuration * reward * liq) / (duration * totalLiq);
   }
 
+  function _buildFlags(
+    bool isClaimFee,
+    bool isSyncFee,
+    bool isClaimReward,
+    bool isReceiveNative
+  ) internal pure returns (uint8 flags) {
+    if (isReceiveNative) flags = 1;
+
+    if (isClaimFee) flags = flags | (1 << 3);
+    if (isSyncFee) flags = flags | (1 << 2);
+    if (isClaimReward) flags = flags | (1 << 1);
+  }
+
   function testSetUp() public virtual {
     assertEq(address(lm.getNft()), address(nft));
 
@@ -304,7 +317,14 @@ contract EmptyRewards is FoundryHelper {
     _addLiquidity(nftId, 1 ether, 1 wei);
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId, _getLiq(nftId), 0, 0, UINT256_MAX, false, false);
+    lm.removeLiquidity(
+      nftId,
+      _getLiq(nftId),
+      0,
+      0,
+      UINT256_MAX,
+      _buildFlags(false, false, false, false)
+    );
     vm.stopPrank();
 
     (
@@ -333,7 +353,7 @@ contract EmptyRewards is FoundryHelper {
     uint256 balanceBefore = payable(jensen).balance;
 
     vm.startPrank(jensen);
-    lm.claimFee(fId, nftIds, 0, 0, UINT256_MAX, true);
+    lm.claimFee(fId, nftIds, 0, 0, UINT256_MAX, _buildFlags(false, true, false, true));
     vm.stopPrank();
 
     uint256 balanceAfter = payable(jensen).balance;
@@ -794,7 +814,14 @@ contract EmptyRewards is FoundryHelper {
     uint256 usdtAmount = 994742 + 1983;
 
     vm.startPrank(jensen);
-    lm.removeLiquidity(nftId, uint128(nftIdLiq), 0, 0, MAX_UINT256, true, true);
+    lm.removeLiquidity(
+      nftId,
+      uint128(nftIdLiq),
+      0,
+      0,
+      MAX_UINT256,
+      _buildFlags(true, false, false, true)
+    );
     vm.stopPrank();
 
     assertEq(payable(jensen).balance, 1000 ether + maticAmount);
@@ -820,7 +847,7 @@ contract EmptyRewards is FoundryHelper {
     uint256 usdtAmount = 1983;
 
     vm.startPrank(jensen);
-    lm.claimFee(fId, _toArray(nftId), 0, 0, MAX_UINT256, true);
+    lm.claimFee(fId, _toArray(nftId), 0, 0, MAX_UINT256, _buildFlags(false, true, false, true));
     vm.stopPrank();
 
     assertEq(payable(jensen).balance, 1000 ether + maticAmount);

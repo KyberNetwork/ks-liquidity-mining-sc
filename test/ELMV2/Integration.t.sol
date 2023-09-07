@@ -91,6 +91,19 @@ contract Integration is FoundryHelper {
     vm.stopPrank();
   }
 
+  function _buildFlags(
+    bool isClaimFee,
+    bool isSyncFee,
+    bool isClaimReward,
+    bool isReceiveNative
+  ) internal pure returns (uint8 flags) {
+    if (isReceiveNative) flags = 1;
+
+    if (isClaimFee) flags = flags | (1 << 3);
+    if (isSyncFee) flags = flags | (1 << 2);
+    if (isClaimReward) flags = flags | (1 << 1);
+  }
+
   function test_In_01() public {
     vm.startPrank(deployer);
 
@@ -1551,9 +1564,30 @@ contract Integration is FoundryHelper {
     removeLiqs[1] = 10 ether;
     removeLiqs[2] = 10 ether;
 
-    farm.removeLiquidity(listNFT[0], removeLiqs[0], 0, 0, 2 ** 255, true, false);
-    farm.removeLiquidity(listNFT[1], removeLiqs[1], 0, 0, 2 ** 255, true, false);
-    farm.removeLiquidity(listNFT[2], removeLiqs[2], 0, 0, 2 ** 255, true, false);
+    farm.removeLiquidity(
+      listNFT[0],
+      removeLiqs[0],
+      0,
+      0,
+      2 ** 255,
+      _buildFlags(true, false, false, false)
+    );
+    farm.removeLiquidity(
+      listNFT[1],
+      removeLiqs[1],
+      0,
+      0,
+      2 ** 255,
+      _buildFlags(true, false, false, false)
+    );
+    farm.removeLiquidity(
+      listNFT[2],
+      removeLiqs[2],
+      0,
+      0,
+      2 ** 255,
+      _buildFlags(true, false, false, false)
+    );
 
     (
       ,
@@ -1633,7 +1667,14 @@ contract Integration is FoundryHelper {
     removeLiqs[1] = 10 ether;
     removeLiqs[2] = 10 ether;
 
-    farm.removeLiquidity(listNFT[0], removeLiqs[0], 0, 0, 2 ** 255, true, false);
+    farm.removeLiquidity(
+      listNFT[0],
+      removeLiqs[0],
+      0,
+      0,
+      2 ** 255,
+      _buildFlags(true, false, false, false)
+    );
   }
 
   function test_In_30_withdrawEmergency_list_nfts() public {
@@ -1739,5 +1780,188 @@ contract Integration is FoundryHelper {
 
     vm.expectRevert(abi.encodeWithSignature('NotOwner()'));
     farm.withdrawEmergency(listNFT);
+  }
+
+  function test_In_32_deposit_with_empty_nft_list() public {
+    vm.startPrank(deployer);
+
+    IELM3.RangeInput[] memory r = new IELM3.RangeInput[](1);
+    r[0] = IELM3.RangeInput({tickLower: -5, tickUpper: -2, weight: 2});
+
+    IELM3.RewardInput[] memory rw = new IELM3.RewardInput[](2);
+    rw[0] = IELM3.RewardInput({rewardToken: address(token), rewardAmount: 300 ether});
+    rw[1] = IELM3.RewardInput({
+      rewardToken: address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE),
+      rewardAmount: 300 ether
+    });
+
+    IELM3.PhaseInput memory p = IELM3.PhaseInput({startTime: st, endTime: et, rewards: rw});
+    token.approve(address(farm), MAX_UINT256);
+
+    uint256 fId = farm.addFarm(ePool, r, p, true);
+    token.transfer(address(farm), 300 ether);
+    vm.deal(address(farm), 300 ether);
+
+    vm.warp(st + 1 days);
+
+    changePrank(user1);
+    nft.setApprovalForAll(address(farm), true);
+    uint256[] memory listNFT;
+
+    farm.deposit(fId, 0, listNFT, user1);
+
+    (, , , uint256 fLiq, , uint256[] memory sumRewardPerLiquidity, uint32 lastTouchedTime) = farm
+      .getFarm(fId);
+
+    assertEq(fLiq, 0); // nothing changed
+    assertEq(sumRewardPerLiquidity[0], 0);
+    assertEq(lastTouchedTime, st + 1 days);
+  }
+
+  function test_In_33_claim_reward_with_empty_nft_list() public {
+    vm.startPrank(deployer);
+
+    IELM3.RangeInput[] memory r = new IELM3.RangeInput[](1);
+    r[0] = IELM3.RangeInput({tickLower: -5, tickUpper: -2, weight: 2});
+
+    IELM3.RewardInput[] memory rw = new IELM3.RewardInput[](2);
+    rw[0] = IELM3.RewardInput({rewardToken: address(token), rewardAmount: 300 ether});
+    rw[1] = IELM3.RewardInput({
+      rewardToken: address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE),
+      rewardAmount: 300 ether
+    });
+
+    IELM3.PhaseInput memory p = IELM3.PhaseInput({startTime: st, endTime: et, rewards: rw});
+    token.approve(address(farm), MAX_UINT256);
+
+    uint256 fId = farm.addFarm(ePool, r, p, true);
+    token.transfer(address(farm), 300 ether);
+    vm.deal(address(farm), 300 ether);
+
+    changePrank(user1);
+    nft.setApprovalForAll(address(farm), true);
+    uint256[] memory listNFT = new uint256[](3);
+    listNFT[0] = nft0;
+    listNFT[1] = nft1;
+    listNFT[2] = nft11;
+
+    farm.deposit(fId, 0, listNFT, user1);
+
+    vm.warp(st + 1 days);
+
+    uint256[] memory emptyNft;
+    farm.claimReward(fId, emptyNft);
+
+    (, , , , , uint256[] memory sumRewardPerLiquidity, uint32 lastTouchedTime) = farm.getFarm(fId);
+
+    //farm state were updated but no rewards given out
+    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(lastTouchedTime, st + 1 days);
+    assertEq(token.balanceOf(address(farm)), 300 ether);
+    assertEq(payable(address(farm)).balance, 300 ether);
+  }
+
+  function test_In_34_withdraw_with_empty_nft_list() public {
+    vm.startPrank(deployer);
+
+    IELM3.RangeInput[] memory r = new IELM3.RangeInput[](1);
+    r[0] = IELM3.RangeInput({tickLower: -5, tickUpper: -2, weight: 2});
+
+    IELM3.RewardInput[] memory rw = new IELM3.RewardInput[](2);
+    rw[0] = IELM3.RewardInput({rewardToken: address(token), rewardAmount: 300 ether});
+    rw[1] = IELM3.RewardInput({
+      rewardToken: address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE),
+      rewardAmount: 300 ether
+    });
+
+    IELM3.PhaseInput memory p = IELM3.PhaseInput({startTime: st, endTime: et, rewards: rw});
+    token.approve(address(farm), MAX_UINT256);
+
+    uint256 fId = farm.addFarm(ePool, r, p, true);
+    token.transfer(address(farm), 300 ether);
+    vm.deal(address(farm), 300 ether);
+
+    changePrank(user1);
+    nft.setApprovalForAll(address(farm), true);
+    uint256[] memory listNFT = new uint256[](3);
+    listNFT[0] = nft0;
+    listNFT[1] = nft1;
+    listNFT[2] = nft11;
+
+    farm.deposit(fId, 0, listNFT, user1);
+
+    vm.warp(st + 1 days);
+
+    uint256[] memory emptyNft;
+    farm.withdraw(fId, emptyNft);
+
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = farm.getFarm(fId);
+
+    //farm state were updated but no rewards given out
+    assertEq(liquidity, 180 ether);
+    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(lastTouchedTime, st + 1 days);
+    assertEq(token.balanceOf(address(farm)), 300 ether);
+    assertEq(payable(address(farm)).balance, 300 ether);
+  }
+
+  function test_In_35_withdrawEmerency_with_empty_nft_list() public {
+    vm.startPrank(deployer);
+
+    IELM3.RangeInput[] memory r = new IELM3.RangeInput[](1);
+    r[0] = IELM3.RangeInput({tickLower: -5, tickUpper: -2, weight: 2});
+
+    IELM3.RewardInput[] memory rw = new IELM3.RewardInput[](2);
+    rw[0] = IELM3.RewardInput({rewardToken: address(token), rewardAmount: 300 ether});
+    rw[1] = IELM3.RewardInput({
+      rewardToken: address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE),
+      rewardAmount: 300 ether
+    });
+
+    IELM3.PhaseInput memory p = IELM3.PhaseInput({startTime: st, endTime: et, rewards: rw});
+    token.approve(address(farm), MAX_UINT256);
+
+    uint256 fId = farm.addFarm(ePool, r, p, true);
+    token.transfer(address(farm), 300 ether);
+    vm.deal(address(farm), 300 ether);
+
+    changePrank(user1);
+    nft.setApprovalForAll(address(farm), true);
+    uint256[] memory listNFT = new uint256[](3);
+    listNFT[0] = nft0;
+    listNFT[1] = nft1;
+    listNFT[2] = nft11;
+
+    farm.deposit(fId, 0, listNFT, user1);
+
+    vm.warp(st + 1 days);
+
+    uint256[] memory emptyNft;
+    farm.withdrawEmergency(emptyNft);
+
+    (
+      ,
+      ,
+      ,
+      uint256 liquidity,
+      ,
+      uint256[] memory sumRewardPerLiquidity,
+      uint32 lastTouchedTime
+    ) = farm.getFarm(fId);
+
+    //farm state not updated and no rewards given out
+    assertEq(liquidity, 180 ether);
+    assertEq(sumRewardPerLiquidity[0], 0);
+    assertEq(lastTouchedTime, st);
+    assertEq(token.balanceOf(address(farm)), 300 ether);
+    assertEq(payable(address(farm)).balance, 300 ether);
   }
 }

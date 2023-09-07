@@ -216,4 +216,17 @@ contract Base is Test {
       }
     }
   }
+
+  function _buildFlags(
+    bool isClaimFee,
+    bool isSyncFee,
+    bool isClaimReward,
+    bool isReceiveNative
+  ) internal pure returns (uint8 flags) {
+    if (isReceiveNative) flags = 1;
+
+    if (isClaimFee) flags = flags | (1 << 3);
+    if (isSyncFee) flags = flags | (1 << 2);
+    if (isClaimReward) flags = flags | (1 << 1);
+  }
 }
