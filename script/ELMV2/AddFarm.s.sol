@@ -28,15 +28,15 @@ contract AddFarm is Script {
     address farmSC = 0xbb62F365ECffbaca1d255Eed77c60c70F840f6E2;
     address rwToken1 = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
     address rwToken2 = 0xFbBd93fC3BE8B048c007666AF4846e4A36BACC95;
-    uint32 st = 1686214800;
-    uint32 et = 1686391200;
+    uint32 st = 1_686_214_800;
+    uint32 et = 1_686_391_200;
 
     vm.startBroadcast(deployerPrivateKey);
 
     IELM2 sc = IELM2(farmSC);
 
     IELM2.RangeInput[] memory r = new IELM2User.RangeInput[](1);
-    r[0] = IELM2User.RangeInput({tickLower: -283260, tickUpper: -273700, weight: 1});
+    r[0] = IELM2User.RangeInput({tickLower: -283_260, tickUpper: -273_700, weight: 1});
 
     IELM2.RewardInput[] memory rw = new IELM2User.RewardInput[](2);
     rw[0] = IELM2User.RewardInput({rewardToken: rwToken1, rewardAmount: 5 ether});

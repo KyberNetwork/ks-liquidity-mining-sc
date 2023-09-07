@@ -126,8 +126,8 @@ contract MockNftManagerV2 is ERC721 {
 
   function transferAllTokens(
     address token,
-    uint256 /* minAmount */,
-    address recipient
+    uint256,
+    /* minAmount */ address recipient
   ) external payable {
     IERC20(token).transfer(recipient, IERC20(token).balanceOf(address(this)));
   }

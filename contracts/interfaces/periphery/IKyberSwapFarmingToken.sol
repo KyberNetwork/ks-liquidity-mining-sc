@@ -57,7 +57,8 @@ interface IKyberSwapFarmingToken {
    */
   function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
 
-  /** @dev Creates `amount` tokens and assigns them to `account`, increasing
+  /**
+   * @dev Creates `amount` tokens and assigns them to `account`, increasing
    * the total supply.
    *
    * Emits a {Transfer} event with `from` set to the zero address.

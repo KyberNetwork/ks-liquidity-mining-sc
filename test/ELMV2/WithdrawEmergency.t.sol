@@ -112,8 +112,8 @@ contract WithdrawEmergency is Base {
     assertEq(nft.ownerOf(nftId), address(lm));
     assertEq(liquidityDeposited, _getLiq(nftId) * 2);
     assertEq(farmingTokenBalance, _getLiq(nftId) * 2);
-    assertEq(lastSumRewardPerLiquidity[0], 5166577116541744582707195283);
-    assertEq(lastSumRewardPerLiquidity[1], 5166577116541744582707195283);
+    assertEq(lastSumRewardPerLiquidity[0], 5_166_577_116_541_744_582_707_195_283);
+    assertEq(lastSumRewardPerLiquidity[1], 5_166_577_116_541_744_582_707_195_283);
 
     uint256[] memory listNftIds = lm.getDepositedNFTs(jensen);
     assertEq(listNftIds.length, 1);
@@ -125,8 +125,8 @@ contract WithdrawEmergency is Base {
     lm.claimReward(fId, nfts);
     vm.stopPrank();
 
-    assertEq(usdc.balanceOf(jensen), 31991398);
-    assertEq(usdt.balanceOf(jensen), 31991398);
+    assertEq(usdc.balanceOf(jensen), 31_991_398);
+    assertEq(usdt.balanceOf(jensen), 31_991_398);
   }
 
   function testWithdrawEmgergencyWithEmergencyEnabledThenDepositAgain() public {

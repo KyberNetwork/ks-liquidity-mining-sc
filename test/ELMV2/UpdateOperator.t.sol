@@ -31,14 +31,14 @@ contract UpdateOperator is Base {
     vm.stopPrank();
 
     vm.startPrank(jensen);
-    vm.expectRevert('forbidden');
+    vm.expectRevert('KyberSwapRole: not operator');
     lm.forceClosePhase(fId);
     vm.stopPrank();
   }
 
   function testUpdateOperatorFailNotAdmin() public {
     vm.startPrank(jensen);
-    vm.expectRevert('forbidden');
+    vm.expectRevert('KyberSwapRole: not owner');
     lm.updateOperator(jensen, true);
     vm.stopPrank();
   }

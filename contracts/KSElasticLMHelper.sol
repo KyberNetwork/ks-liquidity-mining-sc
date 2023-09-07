@@ -14,16 +14,16 @@ import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManager.so
 import {IPoolStorage} from 'contracts/interfaces/IPoolStorage.sol';
 import {IKSElasticLMV2 as IELMV2} from 'contracts/interfaces/IKSElasticLMV2.sol';
 
-import {KSAdmin} from './base/KSAdmin.sol';
+import {KyberSwapRole} from './base/KyberSwapRole.sol';
 
-contract KSElasticLMHelper is IKSElasticLMHelper, KSAdmin {
+contract KSElasticLMHelper is IKSElasticLMHelper, KyberSwapRole {
   error PositionNotEligible();
 
   using SafeERC20 for IERC20;
 
   event RescueFund(address token, uint256 amount);
 
-  function rescueFund(IERC20 token, uint256 amount) external isAdmin {
+  function rescueFund(IERC20 token, uint256 amount) external onlyOwner {
     if (address(token) == address(0)) {
       (bool success, ) = payable(msg.sender).call{value: amount}('');
       require(success, 'rescueFund: failed to collect native');
@@ -149,7 +149,9 @@ contract KSElasticLMHelper is IKSElasticLMHelper, KSAdmin {
         tickLower <= rangesInfo[i].tickLower &&
         tickUpper >= rangesInfo[i].tickUpper &&
         !rangesInfo[i].isRemoved
-      ) ++count;
+      ) {
+        ++count;
+      }
     }
 
     indexesValid = new uint256[](count);

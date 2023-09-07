@@ -15,11 +15,11 @@ contract AddPhase is Script {
     uint256 fId = 0;
     address farmSC = 0xbb62F365ECffbaca1d255Eed77c60c70F840f6E2;
     address rwToken1 = 0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE;
-    uint256 rewardAmount1 = 10000000000000000000;
+    uint256 rewardAmount1 = 10_000_000_000_000_000_000;
     address rwToken2 = 0xFbBd93fC3BE8B048c007666AF4846e4A36BACC95;
-    uint256 rewardAmount2 = 1000000000000000000000;
-    uint32 st = 1686561163;
-    uint32 et = 1687770763;
+    uint256 rewardAmount2 = 1_000_000_000_000_000_000_000;
+    uint32 st = 1_686_561_163;
+    uint32 et = 1_687_770_763;
 
     vm.startBroadcast(deployerPrivateKey);
 

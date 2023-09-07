@@ -7,9 +7,9 @@ import {IERC20Metadata} from '@openzeppelin/contracts/token/ERC20/extensions/IER
 import {GeneratedToken} from 'contracts/periphery/GeneratedToken.sol';
 import {IGeneratedToken} from 'contracts/interfaces/periphery/IGeneratedToken.sol';
 import {IKSFairLaunchV3} from 'contracts/interfaces/IKSFairLaunchV3.sol';
-import {KSAdmin} from 'contracts/base/KSAdmin.sol';
+import {KyberSwapRole} from 'contracts/base/KyberSwapRole.sol';
 
-contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
+contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
   using SafeERC20 for IERC20Metadata;
 
   uint256 internal constant PRECISION = 1e12;
@@ -33,7 +33,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
    * @param tokenAddress: reward token to withdraw
    * @param amount: amount token to withdraw
    */
-  function adminWithdraw(address tokenAddress, uint256 amount) external isAdmin {
+  function adminWithdraw(address tokenAddress, uint256 amount) external onlyOwner {
     if (whitelistStakeToken[tokenAddress]) revert NotAllowed();
     _transferToken(tokenAddress, msg.sender, amount);
   }
@@ -54,7 +54,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
     address[] calldata rewardTokens,
     uint256[] calldata rewardAmounts,
     string[2] calldata gTokenDatas
-  ) external isOperator {
+  ) external onlyOperator {
     if (startTime < block.timestamp || endTime <= startTime) revert InvalidTimes();
 
     PoolInfo storage pool = pools[poolLength];
@@ -105,13 +105,14 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
     uint32 startTime,
     uint32 endTime,
     uint256[] calldata rewardAmounts
-  ) external isOperator {
+  ) external onlyOperator {
     updatePoolRewards(pId);
     // check if pool has not started or already ended
     if (startTime <= block.timestamp || endTime <= startTime) revert InvalidTimes();
     PoolInfo storage pool = pools[pId];
-    if (pool.startTime <= block.timestamp && pool.endTime >= block.timestamp)
+    if (pool.startTime <= block.timestamp && pool.endTime >= block.timestamp) {
       revert InvalidPoolState();
+    }
     if (pool.poolRewards.length != rewardAmounts.length) revert InvalidLength();
 
     pool.startTime = startTime;
@@ -138,7 +139,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
     uint256 pId,
     uint32 endTime,
     uint256[] calldata rewardAmounts
-  ) external isOperator {
+  ) external onlyOperator {
     updatePoolRewards(pId);
 
     PoolInfo storage pool = pools[pId];
@@ -168,7 +169,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
     uint256 pId,
     uint256 amount,
     bool shouldHarvest
-  ) external override nonReentrant {
+  ) external override nonReentrant onlyEnabled {
     // update pool rewards, user's rewards
     updatePoolRewards(pId);
     _updateUserReward(msg.sender, pId, shouldHarvest);
@@ -197,7 +198,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
    * @param pId: id of the pool
    * @param amount: amount of stakeToken to withdraw
    */
-  function withdraw(uint256 pId, uint256 amount) external override nonReentrant {
+  function withdraw(uint256 pId, uint256 amount) external override nonReentrant onlyEnabled {
     _withdraw(pId, amount);
   }
 
@@ -205,7 +206,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
    * @dev Withdraw all tokens (of the sender) from pool, also harvest reward
    * @param pId: id of the pool
    */
-  function withdrawAll(uint256 pId) external override nonReentrant {
+  function withdrawAll(uint256 pId) external override nonReentrant onlyEnabled {
     _withdraw(pId, users[pId][msg.sender].amount);
   }
 
@@ -247,12 +248,12 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
    * @dev Harvest rewards from a pool for the sender
    * @param pId: id of the pool
    */
-  function harvest(uint256 pId) public override {
+  function harvest(uint256 pId) public override onlyEnabled {
     updatePoolRewards(pId);
     _updateUserReward(msg.sender, pId, true);
   }
 
-  function updatePoolRewards(uint256 pId) public override {
+  function updatePoolRewards(uint256 pId) public override onlyEnabled {
     if (pId >= poolLength) revert InvalidPool();
     PoolInfo storage pool = pools[pId];
 

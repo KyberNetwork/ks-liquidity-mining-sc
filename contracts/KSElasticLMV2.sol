@@ -7,7 +7,7 @@ import {ReentrancyGuard} from '@openzeppelin/contracts/security/ReentrancyGuard.
 import {EnumerableSet} from '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 
 import {LMMath} from 'contracts/libraries/LMMath.sol';
-import {KSAdmin} from 'contracts/base/KSAdmin.sol';
+import {KyberSwapRole} from 'contracts/base/KyberSwapRole.sol';
 
 import {IKSElasticLMV2} from 'contracts/interfaces/IKSElasticLMV2.sol';
 import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManager.sol';
@@ -15,7 +15,7 @@ import {IPoolStorage} from 'contracts/interfaces/IPoolStorage.sol';
 import {IKSElasticLMHelper} from 'contracts/interfaces/IKSElasticLMHelper.sol';
 import {IKyberSwapFarmingToken} from 'contracts/interfaces/periphery/IKyberSwapFarmingToken.sol';
 
-contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
+contract KSElasticLMV2 is IKSElasticLMV2, KyberSwapRole, ReentrancyGuard {
   using EnumerableSet for EnumerableSet.UintSet;
 
   address private constant ETH_ADDRESS = address(0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE);
@@ -47,21 +47,21 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
   // ======== admin ============
 
   //enable emergency mode
-  function updateEmergency(bool enableOrDisable) external isAdmin {
+  function updateEmergency(bool enableOrDisable) external onlyOwner {
     emergencyEnabled = enableOrDisable;
 
     emit UpdateEmergency(enableOrDisable);
   }
 
   //update farming token creationCode, use to deploy when add farm
-  function updateTokenCode(bytes memory _farmingTokenCreationCode) external isAdmin {
+  function updateTokenCode(bytes memory _farmingTokenCreationCode) external onlyOwner {
     farmingTokenCreationCode = _farmingTokenCreationCode;
 
     emit UpdateTokenCode(_farmingTokenCreationCode);
   }
 
   //update helper contract, use to gather information from elastic
-  function updateHelper(IKSElasticLMHelper _helper) external isAdmin {
+  function updateHelper(IKSElasticLMHelper _helper) external onlyOwner {
     helper = _helper;
 
     emit UpdateHelper(_helper);
@@ -71,7 +71,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
   function withdrawUnusedRewards(
     address[] calldata tokens,
     uint256[] calldata amounts
-  ) external isAdmin {
+  ) external onlyOwner {
     uint256 rewardTokenLength = tokens.length;
     for (uint256 i; i < rewardTokenLength; ) {
       _safeTransfer(tokens[i], msg.sender, amounts[i]);
@@ -89,7 +89,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     RangeInput[] calldata ranges,
     PhaseInput calldata phase,
     bool isUsingToken
-  ) external isOperator returns (uint256 fId) {
+  ) external onlyOperator returns (uint256 fId) {
     //new farm id would be current farmCount
     fId = farmCount;
     FarmInfo storage farm = farms[fId];
@@ -159,7 +159,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     emit AddFarm(fId, poolAddress, ranges, phase, destination);
   }
 
-  function addPhase(uint256 fId, PhaseInput calldata phaseInput) external isOperator {
+  function addPhase(uint256 fId, PhaseInput calldata phaseInput) external onlyOperator {
     if (fId >= farmCount) revert InvalidFarm();
 
     //validate phase input
@@ -180,8 +180,9 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
 
     for (uint256 i; i < length; ) {
       //new phase rewards must be the same as old phase
-      if (phase.rewards[i].rewardToken != phaseInput.rewards[i].rewardToken)
+      if (phase.rewards[i].rewardToken != phaseInput.rewards[i].rewardToken) {
         revert InvalidReward();
+      }
 
       //update reward amounts
       phase.rewards[i].rewardAmount = phaseInput.rewards[i].rewardAmount;
@@ -200,7 +201,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     emit AddPhase(fId, phaseInput);
   }
 
-  function forceClosePhase(uint256 fId) external isOperator {
+  function forceClosePhase(uint256 fId) external onlyOperator {
     if (fId >= farmCount) revert InvalidFarm();
 
     if (farms[fId].phase.isSettled) revert PhaseSettled();
@@ -214,7 +215,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     emit ForceClosePhase(fId);
   }
 
-  function addRange(uint256 fId, RangeInput calldata range) external isOperator {
+  function addRange(uint256 fId, RangeInput calldata range) external onlyOperator {
     if (fId >= farmCount) revert InvalidFarm();
     _isRangeValid(range);
 
@@ -231,10 +232,11 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     emit AddRange(fId, range);
   }
 
-  function removeRange(uint256 fId, uint256 rangeId) external isOperator {
+  function removeRange(uint256 fId, uint256 rangeId) external onlyOperator {
     if (fId >= farmCount) revert InvalidFarm();
-    if (rangeId >= farms[fId].ranges.length || farms[fId].ranges[rangeId].isRemoved)
+    if (rangeId >= farms[fId].ranges.length || farms[fId].ranges[rangeId].isRemoved) {
       revert RangeNotFound();
+    }
 
     //remove a range aka set isRemoved to true, it's still be in ranges array but cannot deposit to this range anymore
     farms[fId].ranges[rangeId].isRemoved = true;
@@ -242,10 +244,11 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     emit RemoveRange(fId, rangeId);
   }
 
-  function activateRange(uint256 fId, uint256 rangeId) external isOperator {
+  function activateRange(uint256 fId, uint256 rangeId) external onlyOperator {
     if (fId >= farmCount) revert InvalidFarm();
-    if (rangeId >= farms[fId].ranges.length || !farms[fId].ranges[rangeId].isRemoved)
+    if (rangeId >= farms[fId].ranges.length || !farms[fId].ranges[rangeId].isRemoved) {
       revert RangeNotFound();
+    }
 
     //activate a removed range aka set isRemoved to false, this range can deposit now
     farms[fId].ranges[rangeId].isRemoved = false;
@@ -260,7 +263,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     uint256 rangeId,
     uint256[] calldata nftIds,
     address receiver
-  ) external override nonReentrant {
+  ) external override nonReentrant onlyEnabled {
     _isAddLiquidityValid(fId, rangeId);
 
     //check positions meet farm requirements
@@ -322,12 +325,18 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
   }
 
   /// @inheritdoc IKSElasticLMV2
-  function claimReward(uint256 fId, uint256[] calldata nftIds) external override nonReentrant {
+  function claimReward(
+    uint256 fId,
+    uint256[] calldata nftIds
+  ) external override nonReentrant onlyEnabled {
     _claimReward(fId, nftIds, msg.sender);
   }
 
   /// @inheritdoc IKSElasticLMV2
-  function withdraw(uint256 fId, uint256[] calldata nftIds) external override nonReentrant {
+  function withdraw(
+    uint256 fId,
+    uint256[] calldata nftIds
+  ) external override nonReentrant onlyEnabled {
     _claimReward(fId, nftIds, msg.sender);
 
     uint256 length = nftIds.length;
@@ -353,8 +362,9 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     farms[fId].liquidity -= totalLiq;
 
     //burn an amount of farmingToken from msg.sender
-    if (farms[fId].farmingToken != address(0))
+    if (farms[fId].farmingToken != address(0)) {
       _burnFarmingToken(farms[fId].farmingToken, msg.sender, totalLiq);
+    }
 
     emit Withdraw(nftIds, msg.sender);
   }
@@ -364,7 +374,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     uint256 fId,
     uint256 rangeId,
     uint256[] memory nftIds
-  ) external override nonReentrant {
+  ) external override nonReentrant onlyEnabled {
     _isAddLiquidityValid(fId, rangeId);
 
     uint256 length = nftIds.length;
@@ -395,7 +405,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     uint256 amount1Min,
     uint256 deadline,
     uint8 flags
-  ) external override nonReentrant {
+  ) external override nonReentrant onlyEnabled {
     if (block.timestamp > deadline) revert Expired();
     if (stakes[nftId].owner != msg.sender) revert NotOwner();
 
@@ -453,7 +463,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
     uint256 amount1Min,
     uint256 deadline,
     uint8 flags
-  ) external override nonReentrant {
+  ) external override nonReentrant onlyEnabled {
     if (block.timestamp > deadline) revert Expired();
 
     bool isSyncFee = _checkFlags(IS_SYNC_FEE, flags);
@@ -490,8 +500,9 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
         uint256 liquidity = stake.liquidity;
 
         //burn farmingToken from msg.sender if stake liquidity greater than 0
-        if (farmingToken != address(0) && liquidity != 0)
+        if (farmingToken != address(0) && liquidity != 0) {
           _burnFarmingToken(farmingToken, stake.owner, liquidity);
+        }
 
         //remove nft from deposited nft list
         if (!depositNFTs[stake.owner].remove(nftId)) revert FailToRemove();
@@ -921,18 +932,21 @@ contract KSElasticLMV2 is IKSElasticLMV2, KSAdmin, ReentrancyGuard {
 
   /// @dev check if phase is valid to be add to farm, revert on fail
   function _isPhaseValid(PhaseInput memory phase) internal view {
-    if (phase.startTime < block.timestamp || phase.endTime <= phase.startTime)
+    if (phase.startTime < block.timestamp || phase.endTime <= phase.startTime) {
       revert InvalidTime();
+    }
   }
 
   /// @dev check if add liquidity conditions are meet or not, revert on fail
   /// @param fId farm's id
   function _isAddLiquidityValid(uint256 fId, uint256 rangeId) internal view {
     if (fId >= farmCount) revert FarmNotFound();
-    if (rangeId >= farms[fId].ranges.length || farms[fId].ranges[rangeId].isRemoved)
+    if (rangeId >= farms[fId].ranges.length || farms[fId].ranges[rangeId].isRemoved) {
       revert RangeNotFound();
-    if (farms[fId].phase.endTime < block.timestamp || farms[fId].phase.isSettled)
+    }
+    if (farms[fId].phase.endTime < block.timestamp || farms[fId].phase.isSettled) {
       revert PhaseSettled();
+    }
     if (emergencyEnabled) revert EmergencyEnabled();
   }
 

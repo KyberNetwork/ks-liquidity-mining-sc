@@ -21,6 +21,7 @@ import {Base} from './Base.t.sol';
 //using mockNft since syncFeeGrowth are not in deployed posManager yet
 contract ClaimFee is Base {
   using SafeERC20 for IERC20;
+
   MockNftManager mockNft;
   MockPool mockPool;
   MockToken mockUsdc;

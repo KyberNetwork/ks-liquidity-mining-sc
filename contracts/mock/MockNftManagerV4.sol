@@ -133,8 +133,8 @@ contract MockNftManagerV4 is ERC721 {
 
   function transferAllTokens(
     address token,
-    uint256 /* minAmount */,
-    address recipient
+    uint256,
+    /* minAmount */ address recipient
   ) external payable {
     MockToken(token).transfer(recipient, MockToken(token).balanceOf(address(this)));
   }

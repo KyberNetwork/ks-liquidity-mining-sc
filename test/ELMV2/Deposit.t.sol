@@ -213,8 +213,8 @@ contract Deposit is Base {
     assertEq(rangeIdDeposited, 0);
     assertEq(liquidityDeposited, _getLiq(nftId2));
     assertEq(farmingTokenBalance, _getLiq(nftId1) * 2 + _getLiq(nftId2));
-    assertEq(lastSumRewardPerLiquidity[0], 138939511855686960426433007); // calculate by rewardAmount * joinedDuration(86399) * 2^96 / duration(2630000) / totalLiq(18733193066)
-    assertEq(lastSumRewardPerLiquidity[1], 138939511855686960426433007);
+    assertEq(lastSumRewardPerLiquidity[0], 138_939_511_855_686_960_426_433_007); // calculate by rewardAmount * joinedDuration(86399) * 2^96 / duration(2630000) / totalLiq(18733193066)
+    assertEq(lastSumRewardPerLiquidity[1], 138_939_511_855_686_960_426_433_007);
   }
 
   function testDepositMultiplePositionAtTheSameTime() public {
