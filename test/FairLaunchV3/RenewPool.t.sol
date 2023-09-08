@@ -77,7 +77,7 @@ contract F3RenewPool is Base {
     lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
 
     changePrank(jensen);
-    vm.expectRevert('forbidden');
+    vm.expectRevert('KyberSwapRole: not operator');
     lm.renewPool(0, fStartTime, fEndTime, rewardAmounts);
   }
 

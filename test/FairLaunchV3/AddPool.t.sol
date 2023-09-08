@@ -48,7 +48,7 @@ contract F3AddPool is Base {
     (rewardTokens, rewardAmounts) = _getRewardData3();
     string[2] memory gTokenDatas;
 
-    vm.expectRevert('forbidden');
+    vm.expectRevert('KyberSwapRole: not operator');
     lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
   }
 
@@ -61,7 +61,7 @@ contract F3AddPool is Base {
     string[2] memory gTokenDatas;
 
     lm.updateOperator(deployer, false);
-    vm.expectRevert('forbidden');
+    vm.expectRevert('KyberSwapRole: not operator');
     lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
   }
 

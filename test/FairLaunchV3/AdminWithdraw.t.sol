@@ -57,7 +57,7 @@ contract F3AdminWithdraw is Base {
 
     _transfer(KNC_ADDRESS, address(lm), 60 ether);
     changePrank(rahoz);
-    vm.expectRevert('forbidden');
+    vm.expectRevert('KyberSwapRole: not owner');
     lm.adminWithdraw(KNC_ADDRESS, 60 ether);
   }
 }

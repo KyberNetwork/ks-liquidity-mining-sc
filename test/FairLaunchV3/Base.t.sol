@@ -74,6 +74,7 @@ contract Base is Test {
     deal(STMATIC, jensen, MOCK_BALANCE);
 
     lm = new KSFairLaunchV3();
+    lm.updateOperator(deployer, true);
     IERC20(POOL_MATIC_STMATIC).approve(address(lm), MAX_UINT);
     IERC20(POOL_KNC_USDC).approve(address(lm), MAX_UINT);
     changePrank(jensen);
