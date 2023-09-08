@@ -5,10 +5,9 @@ import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {IERC721} from '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import {ReentrancyGuard} from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import {EnumerableSet} from '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
+import {KyberSwapRole} from '@ks-growth-utils-sc/contracts/KyberSwapRole.sol';
 
 import {LMMath} from 'contracts/libraries/LMMath.sol';
-import {KyberSwapRole} from 'contracts/base/KyberSwapRole.sol';
-
 import {IKSElasticLMV2} from 'contracts/interfaces/IKSElasticLMV2.sol';
 import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManager.sol';
 import {IPoolStorage} from 'contracts/interfaces/IPoolStorage.sol';

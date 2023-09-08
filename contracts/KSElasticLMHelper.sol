@@ -3,6 +3,7 @@ pragma solidity 0.8.9;
 
 import {IERC20} from '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
+import {KyberSwapRole} from '@ks-growth-utils-sc/contracts/KyberSwapRole.sol';
 
 import {MathConstants as C} from 'contracts/libraries/MathConstants.sol';
 import {FullMath} from 'contracts/libraries/FullMath.sol';
@@ -14,7 +15,6 @@ import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManager.so
 import {IPoolStorage} from 'contracts/interfaces/IPoolStorage.sol';
 import {IKSElasticLMV2 as IELMV2} from 'contracts/interfaces/IKSElasticLMV2.sol';
 
-import {KyberSwapRole} from './base/KyberSwapRole.sol';
 
 contract KSElasticLMHelper is IKSElasticLMHelper, KyberSwapRole {
   error PositionNotEligible();

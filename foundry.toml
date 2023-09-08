@@ -8,7 +8,8 @@ remappings = [
     '@openzeppelin/=node_modules/@openzeppelin/',
     'eth-gas-reporter/=node_modules/eth-gas-reporter/',
     'hardhat/=node_modules/hardhat/',
-    '@root/=contracts/'
+    '@root/=contracts/',
+    '@ks-growth-utils-sc/=lib/ks-growth-utils-sc/'
 ]
 
 optimizer_runs = 200
