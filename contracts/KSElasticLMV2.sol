@@ -263,7 +263,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KyberSwapRole, ReentrancyGuard {
     uint256 rangeId,
     uint256[] calldata nftIds,
     address receiver
-  ) external override nonReentrant whenNotPaused {
+  ) external override nonReentrant {
     _isAddLiquidityValid(fId, rangeId);
 
     //check positions meet farm requirements
@@ -328,7 +328,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KyberSwapRole, ReentrancyGuard {
   function claimReward(
     uint256 fId,
     uint256[] calldata nftIds
-  ) external override nonReentrant whenNotPaused {
+  ) external override nonReentrant {
     _claimReward(fId, nftIds, msg.sender);
   }
 
@@ -336,7 +336,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KyberSwapRole, ReentrancyGuard {
   function withdraw(
     uint256 fId,
     uint256[] calldata nftIds
-  ) external override nonReentrant whenNotPaused {
+  ) external override nonReentrant {
     _claimReward(fId, nftIds, msg.sender);
 
     uint256 length = nftIds.length;
@@ -374,7 +374,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KyberSwapRole, ReentrancyGuard {
     uint256 fId,
     uint256 rangeId,
     uint256[] memory nftIds
-  ) external override nonReentrant whenNotPaused {
+  ) external override nonReentrant {
     _isAddLiquidityValid(fId, rangeId);
 
     uint256 length = nftIds.length;
@@ -405,7 +405,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KyberSwapRole, ReentrancyGuard {
     uint256 amount1Min,
     uint256 deadline,
     uint8 flags
-  ) external override nonReentrant whenNotPaused {
+  ) external override nonReentrant {
     if (block.timestamp > deadline) revert Expired();
     if (stakes[nftId].owner != msg.sender) revert NotOwner();
 
@@ -463,7 +463,7 @@ contract KSElasticLMV2 is IKSElasticLMV2, KyberSwapRole, ReentrancyGuard {
     uint256 amount1Min,
     uint256 deadline,
     uint8 flags
-  ) external override nonReentrant whenNotPaused {
+  ) external override nonReentrant {
     if (block.timestamp > deadline) revert Expired();
 
     bool isSyncFee = _checkFlags(IS_SYNC_FEE, flags);

@@ -169,7 +169,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     uint256 pId,
     uint256 amount,
     bool shouldHarvest
-  ) external override nonReentrant whenNotPaused {
+  ) external override nonReentrant {
     // update pool rewards, user's rewards
     updatePoolRewards(pId);
     _updateUserReward(msg.sender, pId, shouldHarvest);
@@ -248,12 +248,12 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
    * @dev Harvest rewards from a pool for the sender
    * @param pId: id of the pool
    */
-  function harvest(uint256 pId) public override whenNotPaused {
+  function harvest(uint256 pId) public override {
     updatePoolRewards(pId);
     _updateUserReward(msg.sender, pId, true);
   }
 
-  function updatePoolRewards(uint256 pId) public override whenNotPaused {
+  function updatePoolRewards(uint256 pId) public override {
     if (pId >= poolLength) revert InvalidPool();
     PoolInfo storage pool = pools[pId];
 
@@ -385,7 +385,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
   }
 
   // internal
-  function _withdraw(uint256 pId, uint256 amount) internal whenNotPaused {
+  function _withdraw(uint256 pId, uint256 amount) internal {
     PoolInfo storage pool = pools[pId];
     UserInfo storage user = users[pId][msg.sender];
     uint256 uAmount = user.amount;
