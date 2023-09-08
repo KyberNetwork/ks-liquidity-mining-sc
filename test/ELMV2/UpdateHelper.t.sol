@@ -30,7 +30,7 @@ contract UpdateHelper is Base {
     KSElasticLMHelper newHelper = new KSElasticLMHelper();
 
     vm.startPrank(jensen);
-    vm.expectRevert('KyberSwapRole: not owner');
+    vm.expectRevert('Ownable: caller is not the owner');
     lm.updateHelper(newHelper);
     vm.stopPrank();
   }

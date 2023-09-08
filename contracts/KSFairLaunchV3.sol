@@ -169,7 +169,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     uint256 pId,
     uint256 amount,
     bool shouldHarvest
-  ) external override nonReentrant onlyEnabled {
+  ) external override nonReentrant whenNotPaused {
     // update pool rewards, user's rewards
     updatePoolRewards(pId);
     _updateUserReward(msg.sender, pId, shouldHarvest);
@@ -198,7 +198,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
    * @param pId: id of the pool
    * @param amount: amount of stakeToken to withdraw
    */
-  function withdraw(uint256 pId, uint256 amount) external override nonReentrant onlyEnabled {
+  function withdraw(uint256 pId, uint256 amount) external override nonReentrant {
     _withdraw(pId, amount);
   }
 
@@ -206,7 +206,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
    * @dev Withdraw all tokens (of the sender) from pool, also harvest reward
    * @param pId: id of the pool
    */
-  function withdrawAll(uint256 pId) external override nonReentrant onlyEnabled {
+  function withdrawAll(uint256 pId) external override nonReentrant {
     _withdraw(pId, users[pId][msg.sender].amount);
   }
 
@@ -248,12 +248,12 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
    * @dev Harvest rewards from a pool for the sender
    * @param pId: id of the pool
    */
-  function harvest(uint256 pId) public override onlyEnabled {
+  function harvest(uint256 pId) public override whenNotPaused {
     updatePoolRewards(pId);
     _updateUserReward(msg.sender, pId, true);
   }
 
-  function updatePoolRewards(uint256 pId) public override onlyEnabled {
+  function updatePoolRewards(uint256 pId) public override whenNotPaused {
     if (pId >= poolLength) revert InvalidPool();
     PoolInfo storage pool = pools[pId];
 
@@ -385,7 +385,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
   }
 
   // internal
-  function _withdraw(uint256 pId, uint256 amount) internal {
+  function _withdraw(uint256 pId, uint256 amount) internal whenNotPaused {
     PoolInfo storage pool = pools[pId];
     UserInfo storage user = users[pId][msg.sender];
     uint256 uAmount = user.amount;

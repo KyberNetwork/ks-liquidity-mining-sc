@@ -19,7 +19,7 @@ contract TransferAdmin is Base {
 
   function testTransferAdminSuccess() public {
     vm.startPrank(deployer);
-    lm.transferOwner(jensen);
+    lm.transferOwnership(jensen);
     vm.stopPrank();
 
     address newAdmin = lm.owner();
@@ -29,8 +29,8 @@ contract TransferAdmin is Base {
 
   function testTransferAdminFailNotAdmin() public {
     vm.startPrank(jensen);
-    vm.expectRevert('KyberSwapRole: not owner');
-    lm.transferOwner(jensen);
+    vm.expectRevert('Ownable: caller is not the owner');
+    lm.transferOwnership(jensen);
     vm.stopPrank();
   }
 }

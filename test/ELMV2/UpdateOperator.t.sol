@@ -38,7 +38,7 @@ contract UpdateOperator is Base {
 
   function testUpdateOperatorFailNotAdmin() public {
     vm.startPrank(jensen);
-    vm.expectRevert('KyberSwapRole: not owner');
+    vm.expectRevert('Ownable: caller is not the owner');
     lm.updateOperator(jensen, true);
     vm.stopPrank();
   }
