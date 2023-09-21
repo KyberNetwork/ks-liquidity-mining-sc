@@ -45,8 +45,8 @@ contract Base is Test {
   IKSElasticLMV2.PhaseInput public phase;
   IKSElasticLMV2.RangeInput[] public ranges;
 
-  uint32 startTime = 1670578490;
-  uint32 endTime = 1673208490;
+  uint32 startTime = 1_670_578_490;
+  uint32 endTime = 1_673_208_490;
 
   uint256 rewardAmount = 1000 * 10 ** 6;
 

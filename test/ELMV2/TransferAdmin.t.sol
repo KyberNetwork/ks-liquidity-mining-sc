@@ -19,18 +19,18 @@ contract TransferAdmin is Base {
 
   function testTransferAdminSuccess() public {
     vm.startPrank(deployer);
-    lm.transferAdmin(jensen);
+    lm.transferOwnership(jensen);
     vm.stopPrank();
 
-    address newAdmin = lm.admin();
+    address newAdmin = lm.owner();
 
     assertEq(jensen, newAdmin);
   }
 
   function testTransferAdminFailNotAdmin() public {
     vm.startPrank(jensen);
-    vm.expectRevert('forbidden');
-    lm.transferAdmin(jensen);
+    vm.expectRevert('Ownable: caller is not the owner');
+    lm.transferOwnership(jensen);
     vm.stopPrank();
   }
 }

@@ -44,9 +44,11 @@ contract RemoveLiquidity is Base {
     assertEq(fId, expectedFId);
     assertEq(rangeId, expectedRangeId);
     assertEq(stakedLiq, expectedStakeLiq);
-    if (lastSumRewardPerLiquidity.length != 0)
+    if (lastSumRewardPerLiquidity.length != 0) {
       assertEq(lastSumRewardPerLiquidity[0], expectedLastSumRewardPerLiq);
-    else assertEq(expectedLastSumRewardPerLiq, 0);
+    } else {
+      assertEq(expectedLastSumRewardPerLiq, 0);
+    }
     if (rewardUnclaimed.length != 0) assertEq(rewardUnclaimed[0], expectedRewardUnclaimed);
     else assertEq(expectedRewardUnclaimed, 0);
   }
@@ -97,8 +99,8 @@ contract RemoveLiquidity is Base {
 
   function testRemoveLiquiditySuccessCaseRemoveAll() public {
     uint256 nftId = nftIds[2];
-    uint256 amountUsdcShouldBe = 5124844; //get from calling directly to posManager
-    uint256 amountUsdtShouldBe = 4707024; //get from calling directly to posManager
+    uint256 amountUsdcShouldBe = 5_124_844; //get from calling directly to posManager
+    uint256 amountUsdtShouldBe = 4_707_024; //get from calling directly to posManager
 
     uint256 balanceUsdcBefore = usdc.balanceOf(rahoz);
     uint256 balanceUsdtBefore = usdt.balanceOf(rahoz);
@@ -129,8 +131,8 @@ contract RemoveLiquidity is Base {
 
   function testRemoveLiquiditySuccessCaseRemoveAllAndClaimFee() public {
     uint256 nftId = nftIds[2];
-    uint256 amountUsdcShouldBe = 5125701; //get from calling directly to posManager
-    uint256 amountUsdtShouldBe = 4707880; //get from calling directly to posManager
+    uint256 amountUsdcShouldBe = 5_125_701; //get from calling directly to posManager
+    uint256 amountUsdtShouldBe = 4_707_880; //get from calling directly to posManager
 
     uint256 balanceUsdcBefore = usdc.balanceOf(rahoz);
     uint256 balanceUsdtBefore = usdt.balanceOf(rahoz);
@@ -161,8 +163,8 @@ contract RemoveLiquidity is Base {
 
   function testRemoveLiquiditySuccessCaseAddMoreThanRemove() public {
     uint256 nftId = nftIds[2];
-    uint256 amountUsdcShouldBe = 9999999;
-    uint256 amountUsdtShouldBe = 9184715;
+    uint256 amountUsdcShouldBe = 9_999_999;
+    uint256 amountUsdtShouldBe = 9_184_715;
 
     uint256[] memory nfts = new uint256[](1);
     nfts[0] = nftId;
@@ -217,8 +219,8 @@ contract RemoveLiquidity is Base {
 
   function testRemoveLiquiditySuccessCaseAddLessThanRemove() public {
     uint256 nftId = nftIds[2];
-    uint256 amountUsdcShouldBe = 15124844;
-    uint256 amountUsdtShouldBe = 13891739;
+    uint256 amountUsdcShouldBe = 15_124_844;
+    uint256 amountUsdtShouldBe = 13_891_739;
 
     uint256[] memory nfts = new uint256[](1);
     nfts[0] = nftId;
@@ -491,9 +493,9 @@ contract RemoveLiquidity is Base {
     uint256 nftId2 = 262;
     uint256 nftId3 = 263;
 
-    uint256 nft1Liq = 485393355282;
-    uint256 nft2Liq = 2034126572035826;
-    uint256 nft3Liq = 8168583651254383;
+    uint256 nft1Liq = 485_393_355_282;
+    uint256 nft2Liq = 2_034_126_572_035_826;
+    uint256 nft3Liq = 8_168_583_651_254_383;
 
     uint256[] memory nftIds = new uint256[](3);
     nftIds[0] = nftId1;
@@ -626,7 +628,10 @@ contract RemoveLiquidity is Base {
       rewardAmount
     );
 
-    assertEq(balanceAfter - balanceBefore, rewardShouldbe + 5124844 /* remove liquidity amount */);
+    assertEq(
+      balanceAfter - balanceBefore,
+      rewardShouldbe + 5_124_844 /* remove liquidity amount */
+    );
 
     (, , , , , uint256[] memory rewardUnclaimeds) = lm.getStake(nftId);
 
@@ -659,7 +664,7 @@ contract RemoveLiquidity is Base {
     );
 
     uint256 balanceAfter = usdc.balanceOf(deployer);
-    assertEq(balanceAfter - balanceBefore, 5124844 /* remove liquidity amount */);
+    assertEq(balanceAfter - balanceBefore, 5_124_844 /* remove liquidity amount */);
 
     (, , , , , uint256[] memory rewardUnclaimeds) = lm.getStake(nftId);
     uint256 rewardShouldbe = _calculateRewardAmount(
@@ -707,7 +712,10 @@ contract RemoveLiquidity is Base {
       rewardAmount
     );
 
-    assertEq(balanceAfter - balanceBefore, rewardShouldbe + 5124844 /* remove liquidity amount */);
+    assertEq(
+      balanceAfter - balanceBefore,
+      rewardShouldbe + 5_124_844 /* remove liquidity amount */
+    );
 
     vm.warp(startTime + 20 days);
 
@@ -747,7 +755,10 @@ contract RemoveLiquidity is Base {
       rewardAmount
     );
 
-    assertEq(balanceAfter - balanceBefore, rewardShouldbe + 5124844 /* remove liquidity amount */);
+    assertEq(
+      balanceAfter - balanceBefore,
+      rewardShouldbe + 5_124_844 /* remove liquidity amount */
+    );
 
     vm.warp(startTime + 20 days);
 

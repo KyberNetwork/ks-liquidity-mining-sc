@@ -37,8 +37,8 @@ contract Withdraw is Base {
     lm.withdraw(fId, nfts);
     vm.stopPrank();
 
-    assertEq(usdc.balanceOf(jensen), 32851330);
-    assertEq(usdt.balanceOf(jensen), 32851330);
+    assertEq(usdc.balanceOf(jensen), 32_851_330);
+    assertEq(usdt.balanceOf(jensen), 32_851_330);
     assertEq(farmingToken.balanceOf(jensen), 0);
     assertEq(nft.ownerOf(nftId), jensen);
   }
@@ -64,7 +64,7 @@ contract Withdraw is Base {
     lm.deposit(fId, 0, nfts, rahoz);
     vm.stopPrank();
 
-    vm.warp(startTime + 172800);
+    vm.warp(startTime + 172_800);
 
     vm.startPrank(jensen);
     uint256 farmingTokenBalance = farmingToken.balanceOf(jensen);
@@ -73,8 +73,8 @@ contract Withdraw is Base {
     lm.withdraw(fId, nfts);
     vm.stopPrank();
 
-    assertEq(usdc.balanceOf(jensen), 65267178);
-    assertEq(usdt.balanceOf(jensen), 65267178);
+    assertEq(usdc.balanceOf(jensen), 65_267_178);
+    assertEq(usdt.balanceOf(jensen), 65_267_178);
     assertEq(nft.ownerOf(nftId1), jensen);
 
     vm.startPrank(rahoz);
@@ -84,8 +84,8 @@ contract Withdraw is Base {
     lm.withdraw(fId, nfts);
     vm.stopPrank();
 
-    assertEq(usdc.balanceOf(rahoz), 435863);
-    assertEq(usdt.balanceOf(rahoz), 435863);
+    assertEq(usdc.balanceOf(rahoz), 435_863);
+    assertEq(usdt.balanceOf(rahoz), 435_863);
     assertEq(nft.ownerOf(nftId2), rahoz);
   }
 
@@ -183,7 +183,7 @@ contract Withdraw is Base {
     uint256[] memory nfts = new uint256[](1);
     nfts[0] = nftId;
 
-    vm.warp(startTime + 1315000);
+    vm.warp(startTime + 1_315_000);
 
     vm.startPrank(deployer);
     nft.approve(address(lm), nftId);
@@ -198,8 +198,8 @@ contract Withdraw is Base {
     lm.withdraw(fId, nfts);
     vm.stopPrank();
 
-    assertEq(usdc.balanceOf(jensen), 499999999);
-    assertEq(usdt.balanceOf(jensen), 499999999);
+    assertEq(usdc.balanceOf(jensen), 499_999_999);
+    assertEq(usdt.balanceOf(jensen), 499_999_999);
     assertEq(farmingToken.balanceOf(jensen), 0);
     assertEq(nft.ownerOf(nftId), jensen);
   }

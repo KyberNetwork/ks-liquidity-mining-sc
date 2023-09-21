@@ -49,8 +49,8 @@ contract ForceClosePhase is Base {
       uint32 lastTouchedTime
     ) = lm.getFarm(fId);
 
-    assertEq(sumRewardPerLiquidity[0], 138939511855686960426433007); // calculate by rewardAmount * joinedDuration(86399) * 2^96 / duration(2630000) / totalLiq(18733193066)
-    assertEq(sumRewardPerLiquidity[1], 138939511855686960426433007);
+    assertEq(sumRewardPerLiquidity[0], 138_939_511_855_686_960_426_433_007); // calculate by rewardAmount * joinedDuration(86399) * 2^96 / duration(2630000) / totalLiq(18733193066)
+    assertEq(sumRewardPerLiquidity[1], 138_939_511_855_686_960_426_433_007);
     assertEq(lastTouchedTime, startTime + 1 days);
     assertEq(phaseInfo.isSettled, true);
   }

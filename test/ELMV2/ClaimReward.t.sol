@@ -32,7 +32,7 @@ contract ClaimReward is Base {
 
     vm.warp(startTime + 1 days);
 
-    uint256 rewardAmountClaimed = 32851330; // calc manually
+    uint256 rewardAmountClaimed = 32_851_330; // calc manually
 
     assertEq(usdc.balanceOf(jensen), 0);
     assertEq(usdt.balanceOf(jensen), 0);
@@ -72,7 +72,7 @@ contract ClaimReward is Base {
 
     vm.warp(startTime + 1 days);
 
-    uint256 rewardAmountClaimed = 32851330; // calc manually
+    uint256 rewardAmountClaimed = 32_851_330; // calc manually
 
     uint256 balanceETHBefore = payable(jensen).balance;
     uint256 balanceUsdtBefore = usdt.balanceOf(jensen);
@@ -84,8 +84,8 @@ contract ClaimReward is Base {
     uint256 balanceETHAfter = payable(jensen).balance;
     uint256 balanceUsdtAfter = usdt.balanceOf(jensen);
 
-    assertEq(balanceETHAfter - balanceETHBefore, 32851330);
-    assertEq(balanceUsdtAfter - balanceUsdtBefore, 32851330);
+    assertEq(balanceETHAfter - balanceETHBefore, 32_851_330);
+    assertEq(balanceUsdtAfter - balanceUsdtBefore, 32_851_330);
 
     assertEq(payable(address(lm)).balance, rewardAmount - rewardAmountClaimed);
     assertEq(usdt.balanceOf(address(lm)), 2 * rewardAmount - rewardAmountClaimed);

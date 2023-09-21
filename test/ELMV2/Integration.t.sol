@@ -34,7 +34,7 @@ contract Integration is FoundryHelper {
   int24 internal constant MAX_TICK = 887_272;
   address WETH = address(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);
 
-  uint32 private st = 1893430800; // Jan 1 2030
+  uint32 private st = 1_893_430_800; // Jan 1 2030
   uint32 private et = st + 30 days; // next 30 days
 
   uint256 public nft0;
@@ -394,7 +394,7 @@ contract Integration is FoundryHelper {
     changePrank(deployer);
     rw[0] = IELM3.RewardInput({rewardToken: address(token), rewardAmount: 100 ether});
     r[0] = IELM3.RangeInput({tickLower: -4, tickUpper: -2, weight: 5});
-    uint32 st2 = 2529045460; // Aug 7
+    uint32 st2 = 2_529_045_460; // Aug 7
     uint32 et2 = st2 + 30 days; // st2 + 30 days
     p = IELM3.PhaseInput({startTime: st2, endTime: et2, rewards: rw});
     uint256 fId2 = farm.addFarm(ePool, r, p, true);
@@ -725,9 +725,9 @@ contract Integration is FoundryHelper {
     listNFT[0] = nft0;
     farm.withdraw(fId, listNFT);
     uint256 balanceUserAfter = token.balanceOf(address(user1));
-    assertGe(balanceUserAfter - balanceUserBefore, 166315789473684210520); // 99999999999999999996 of first 10 days + 66315789473684210524 for next 9 days
+    assertGe(balanceUserAfter - balanceUserBefore, 166_315_789_473_684_210_520); // 99999999999999999996 of first 10 days + 66315789473684210524 for next 9 days
 
-    assertGe(token.balanceOf(address(farm)), 133684210526315789474); // 300E - 166315789473684210520
+    assertGe(token.balanceOf(address(farm)), 133_684_210_526_315_789_474); // 300E - 166315789473684210520
   }
 
   // increase reward
@@ -980,9 +980,9 @@ contract Integration is FoundryHelper {
     vm.warp(st + 10 days);
     uint256[] memory currentUnclaimedRewards = helperSC.getCurrentUnclaimedReward(farm, nft0);
     assertEq(currentUnclaimedRewards.length, 1);
-    assertEq(currentUnclaimedRewards[0], 60000000000000000000);
+    assertEq(currentUnclaimedRewards[0], 60_000_000_000_000_000_000);
     uint256[] memory currentUnclaimedRewards1 = helperSC.getCurrentUnclaimedReward(farm, nft1);
-    assertEq(currentUnclaimedRewards1[0], 40000000000000000000);
+    assertEq(currentUnclaimedRewards1[0], 40_000_000_000_000_000_000);
 
     changePrank(deployer);
     uint256[] memory rwAmt = new uint256[](1);
@@ -994,9 +994,9 @@ contract Integration is FoundryHelper {
 
     vm.warp(st + 20 days);
     currentUnclaimedRewards = helperSC.getCurrentUnclaimedReward(farm, nft0);
-    assertEq(currentUnclaimedRewards[0], 202105263157894736842);
+    assertEq(currentUnclaimedRewards[0], 202_105_263_157_894_736_842);
     currentUnclaimedRewards1 = helperSC.getCurrentUnclaimedReward(farm, nft1);
-    assertEq(currentUnclaimedRewards1[0], 134736842105263157894);
+    assertEq(currentUnclaimedRewards1[0], 134_736_842_105_263_157_894);
     vm.warp(et);
     rw = new IELM3.RewardInput[](1);
     rw[0] = IELM3.RewardInput({rewardToken: address(token), rewardAmount: 60 ether});
@@ -1151,7 +1151,7 @@ contract Integration is FoundryHelper {
     (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = farm.getFarm(fId);
 
     assertEq(liquidity, 180 ether);
-    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(sumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertApproxEqAbs(token.balanceOf(address(farm)), 290 ether, 10);
     assertApproxEqAbs(payable(address(farm)).balance, 290 ether, 10);
 
@@ -1162,19 +1162,19 @@ contract Integration is FoundryHelper {
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft0);
 
     assertEq(stakedLiq, 60 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertEq(rewardUnclaimed[0], 0);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft1);
 
     assertEq(stakedLiq, 40 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertEq(rewardUnclaimed[0], 0);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft11);
 
     assertEq(stakedLiq, 80 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertEq(rewardUnclaimed[0], 0);
 
     uint256 balanceTokenAfter = token.balanceOf(user1);
@@ -1228,7 +1228,7 @@ contract Integration is FoundryHelper {
     (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = farm.getFarm(fId);
 
     assertEq(liquidity, 180 ether);
-    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(sumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
 
     uint256 stakedLiq;
     uint256[] memory lastSumRewardPerLiquidity;
@@ -1237,13 +1237,13 @@ contract Integration is FoundryHelper {
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft0);
 
     assertEq(stakedLiq, 60 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertEq(rewardUnclaimed[0], 0);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft1);
 
     assertEq(stakedLiq, 40 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertEq(rewardUnclaimed[0], 0);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft11);
@@ -1255,8 +1255,8 @@ contract Integration is FoundryHelper {
     uint256 balanceTokenAfter = token.balanceOf(user1);
     uint256 balanceETHAfter = payable(user1).balance;
 
-    assertApproxEqAbs(balanceTokenAfter - balanceTokenBefore, 5555555555555555555, 10);
-    assertApproxEqAbs(balanceETHAfter - balanceETHBefore, 5555555555555555555, 10);
+    assertApproxEqAbs(balanceTokenAfter - balanceTokenBefore, 5_555_555_555_555_555_555, 10);
+    assertApproxEqAbs(balanceETHAfter - balanceETHBefore, 5_555_555_555_555_555_555, 10);
   }
 
   function test_In_24_withdraw_list_nfts() public {
@@ -1298,7 +1298,7 @@ contract Integration is FoundryHelper {
     (, , , uint256 liquidity, , uint256[] memory sumRewardPerLiquidity, ) = farm.getFarm(fId);
 
     assertEq(liquidity, 0);
-    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(sumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertApproxEqAbs(token.balanceOf(address(farm)), 290 ether, 10);
     assertApproxEqAbs(payable(address(farm)).balance, 290 ether, 10);
 
@@ -1422,7 +1422,7 @@ contract Integration is FoundryHelper {
     ) = farm.getFarm(fId);
 
     assertEq(liquidity, 240 ether);
-    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(sumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
 
     uint256 stakedLiq;
     uint256[] memory lastSumRewardPerLiquidity;
@@ -1431,20 +1431,20 @@ contract Integration is FoundryHelper {
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft0);
 
     assertEq(stakedLiq, 80 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
-    assertApproxEqAbs(rewardUnclaimed[0], 3333333333333333333, 10);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
+    assertApproxEqAbs(rewardUnclaimed[0], 3_333_333_333_333_333_333, 10);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft1);
 
     assertEq(stakedLiq, 60 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
-    assertApproxEqAbs(rewardUnclaimed[0], 2222222222222222222, 10);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
+    assertApproxEqAbs(rewardUnclaimed[0], 2_222_222_222_222_222_222, 10);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft11);
 
     assertEq(stakedLiq, 100 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
-    assertApproxEqAbs(rewardUnclaimed[0], 4444444444444444444, 10);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
+    assertApproxEqAbs(rewardUnclaimed[0], 4_444_444_444_444_444_444, 10);
 
     assertEq(IERC20(farmingToken).balanceOf(user1), 240 ether);
   }
@@ -1501,7 +1501,7 @@ contract Integration is FoundryHelper {
     ) = farm.getFarm(fId);
 
     assertEq(liquidity, 220 ether);
-    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(sumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
 
     uint256 stakedLiq;
     uint256[] memory lastSumRewardPerLiquidity;
@@ -1510,8 +1510,8 @@ contract Integration is FoundryHelper {
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft0);
 
     assertEq(stakedLiq, 80 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
-    assertApproxEqAbs(rewardUnclaimed[0], 3333333333333333333, 10);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
+    assertApproxEqAbs(rewardUnclaimed[0], 3_333_333_333_333_333_333, 10);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft1);
 
@@ -1522,8 +1522,8 @@ contract Integration is FoundryHelper {
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft11);
 
     assertEq(stakedLiq, 100 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
-    assertApproxEqAbs(rewardUnclaimed[0], 4444444444444444444, 10);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
+    assertApproxEqAbs(rewardUnclaimed[0], 4_444_444_444_444_444_444, 10);
 
     assertEq(IERC20(farmingToken).balanceOf(user1), 220 ether);
   }
@@ -1600,7 +1600,7 @@ contract Integration is FoundryHelper {
     ) = farm.getFarm(fId);
 
     assertEq(liquidity, 120 ether);
-    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(sumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
 
     uint256 stakedLiq;
     uint256[] memory lastSumRewardPerLiquidity;
@@ -1609,20 +1609,20 @@ contract Integration is FoundryHelper {
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft0);
 
     assertEq(stakedLiq, 40 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
-    assertApproxEqAbs(rewardUnclaimed[0], 3333333333333333333, 10);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
+    assertApproxEqAbs(rewardUnclaimed[0], 3_333_333_333_333_333_333, 10);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft1);
 
     assertEq(stakedLiq, 20 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
-    assertApproxEqAbs(rewardUnclaimed[0], 2222222222222222222, 10);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
+    assertApproxEqAbs(rewardUnclaimed[0], 2_222_222_222_222_222_222, 10);
 
     (, , , stakedLiq, lastSumRewardPerLiquidity, rewardUnclaimed) = farm.getStake(nft11);
 
     assertEq(stakedLiq, 60 ether);
-    assertEq(lastSumRewardPerLiquidity[0], 4401564584125796532974663907);
-    assertApproxEqAbs(rewardUnclaimed[0], 4444444444444444444, 10);
+    assertEq(lastSumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
+    assertApproxEqAbs(rewardUnclaimed[0], 4_444_444_444_444_444_444, 10);
 
     assertEq(IERC20(farmingToken).balanceOf(user1), 120 ether);
   }
@@ -1855,7 +1855,7 @@ contract Integration is FoundryHelper {
     (, , , , , uint256[] memory sumRewardPerLiquidity, uint32 lastTouchedTime) = farm.getFarm(fId);
 
     //farm state were updated but no rewards given out
-    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(sumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertEq(lastTouchedTime, st + 1 days);
     assertEq(token.balanceOf(address(farm)), 300 ether);
     assertEq(payable(address(farm)).balance, 300 ether);
@@ -1907,7 +1907,7 @@ contract Integration is FoundryHelper {
 
     //farm state were updated but no rewards given out
     assertEq(liquidity, 180 ether);
-    assertEq(sumRewardPerLiquidity[0], 4401564584125796532974663907);
+    assertEq(sumRewardPerLiquidity[0], 4_401_564_584_125_796_532_974_663_907);
     assertEq(lastTouchedTime, st + 1 days);
     assertEq(token.balanceOf(address(farm)), 300 ether);
     assertEq(payable(address(farm)).balance, 300 ether);

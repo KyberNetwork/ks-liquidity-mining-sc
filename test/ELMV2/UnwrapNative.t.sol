@@ -28,22 +28,22 @@ contract UnwrapNative is Base {
   uint256 fWethId;
 
   uint256 nftId = 1; //belongs to poolId 1, liquidity > 0
-  uint128 nftLiq = 117546247299525;
-  uint256 amountWethWhenRemoveLiquidity = 784318538031233553; //get by call directly to posManager
-  uint256 amountWethWhenClaimFee = 17825205570209216; // get by call directly to posManager
+  uint128 nftLiq = 117_546_247_299_525;
+  uint256 amountWethWhenRemoveLiquidity = 784_318_538_031_233_553; //get by call directly to posManager
+  uint256 amountWethWhenClaimFee = 17_825_205_570_209_216; // get by call directly to posManager
 
   uint256 fWethId2;
   uint256 nftId2 = 96;
-  uint128 nft2Liq = 226263781797256566635813;
-  uint256 amountWethWhenRemoveLiquidity2 = 1933092082103344048210;
-  uint256 amountWethWhenClaimFee2 = 3359677506938625020;
+  uint128 nft2Liq = 226_263_781_797_256_566_635_813;
+  uint256 amountWethWhenRemoveLiquidity2 = 1_933_092_082_103_344_048_210;
+  uint256 amountWethWhenClaimFee2 = 3_359_677_506_938_625_020;
 
   function setUp() public override {
     super.setUp();
 
     vm.startPrank(deployer);
-    ranges[1].tickLower = -201000;
-    ranges[1].tickUpper = -200000;
+    ranges[1].tickLower = -201_000;
+    ranges[1].tickUpper = -200_000;
     fWethId = lm.addFarm(wethUsdtPool, ranges, phase, true);
 
     ranges[1].tickLower = 700;
@@ -146,7 +146,7 @@ contract UnwrapNative is Base {
 
     uint256 balanceAfter = payable(jensen).balance;
 
-    assertApproxEqAbs(balanceAfter - balanceBefore, amountWethWhenRemoveLiquidity / 2, 10000);
+    assertApproxEqAbs(balanceAfter - balanceBefore, amountWethWhenRemoveLiquidity / 2, 10_000);
   }
 
   function testUnwrapNativeRemoveAllLiquidityAndClaimFee() public {

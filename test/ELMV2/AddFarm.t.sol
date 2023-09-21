@@ -84,7 +84,7 @@ contract AddFarm is Base {
   }
 
   function testAddFarmRevertInvalidPhaseStartTime() public {
-    phase.startTime = 1670570000; // lower then curBlock timestamp
+    phase.startTime = 1_670_570_000; // lower then curBlock timestamp
 
     vm.startPrank(deployer);
     vm.expectRevert(abi.encodeWithSignature('InvalidTime()'));

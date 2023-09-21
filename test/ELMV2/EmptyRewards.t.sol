@@ -46,9 +46,9 @@ contract EmptyRewards is FoundryHelper {
   uint256 nftId2 = 2;
   uint256 nftId3 = 5;
 
-  uint256 nftIdLiq = 2771314335164;
-  uint256 nftId2Liq = 20014612759279;
-  uint256 nftId3Liq = 364529754791;
+  uint256 nftIdLiq = 2_771_314_335_164;
+  uint256 nftId2Liq = 20_014_612_759_279;
+  uint256 nftId3Liq = 364_529_754_791;
 
   uint256[] nftIds;
 
@@ -56,10 +56,10 @@ contract EmptyRewards is FoundryHelper {
   IKSElasticLMV2.PhaseInput public phase;
   IKSElasticLMV2.RangeInput[] public ranges;
 
-  uint32 startTime = 1686639609;
+  uint32 startTime = 1_686_639_609;
   uint32 endTime = startTime + 30 days;
 
-  uint256 rewardAmount = 10000 * 10 ** 6;
+  uint256 rewardAmount = 10_000 * 10 ** 6;
 
   uint256 fId;
 
@@ -112,8 +112,8 @@ contract EmptyRewards is FoundryHelper {
     phase.endTime = endTime;
     phase.rewards = rewards;
 
-    ranges.push(IKSElasticLMV2.RangeInput({tickLower: -280000, tickUpper: -275000, weight: 1}));
-    ranges.push(IKSElasticLMV2.RangeInput({tickLower: -280000, tickUpper: -270000, weight: 2}));
+    ranges.push(IKSElasticLMV2.RangeInput({tickLower: -280_000, tickUpper: -275_000, weight: 1}));
+    ranges.push(IKSElasticLMV2.RangeInput({tickLower: -280_000, tickUpper: -270_000, weight: 2}));
 
     vm.startPrank(deployer);
     fId = lm.addFarm(wmaticUsdtPool, ranges, phase, false); // set to false to not using farmingToken
@@ -137,7 +137,7 @@ contract EmptyRewards is FoundryHelper {
     IBasePositionManager.IncreaseLiquidityParams memory params = IBasePositionManager
       .IncreaseLiquidityParams({
         tokenId: tokenId,
-        ticksPrevious: [-887272, -887272],
+        ticksPrevious: [-887_272, -887_272],
         amount0Desired: amount0,
         amount1Desired: amount1,
         amount0Min: 0,
@@ -359,7 +359,7 @@ contract EmptyRewards is FoundryHelper {
     uint256 balanceAfter = payable(jensen).balance;
 
     // this number is returned by calling directly to nft
-    assertEq(balanceAfter - balanceBefore, 25520262129608130);
+    assertEq(balanceAfter - balanceBefore, 25_520_262_129_608_130);
   }
 
   // a few more complex cases
@@ -503,8 +503,8 @@ contract EmptyRewards is FoundryHelper {
     vm.warp(startTime + 20 days);
 
     IKSElasticLMV2.RangeInput memory rangeInput = IKSElasticLMV2.RangeInput({
-      tickLower: -280000,
-      tickUpper: -275000,
+      tickLower: -280_000,
+      tickUpper: -275_000,
       weight: 5
     });
 
@@ -810,8 +810,8 @@ contract EmptyRewards is FoundryHelper {
 
     vm.warp(startTime + 20 days);
 
-    uint256 maticAmount = 1479293259822358137 + 3055000975670181; //amount from remove liq + claim fee
-    uint256 usdtAmount = 994742 + 1983;
+    uint256 maticAmount = 1_479_293_259_822_358_137 + 3_055_000_975_670_181; //amount from remove liq + claim fee
+    uint256 usdtAmount = 994_742 + 1983;
 
     vm.startPrank(jensen);
     lm.removeLiquidity(
@@ -843,7 +843,7 @@ contract EmptyRewards is FoundryHelper {
 
     vm.warp(startTime + 20 days);
 
-    uint256 maticAmount = 3055000975670181; //amount from remove liq + claim fee
+    uint256 maticAmount = 3_055_000_975_670_181; //amount from remove liq + claim fee
     uint256 usdtAmount = 1983;
 
     vm.startPrank(jensen);

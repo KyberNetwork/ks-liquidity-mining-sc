@@ -18,18 +18,18 @@ interface IKSFairLaunchV3 {
   struct UserInfo {
     uint256 amount; // How many Staking tokens the user has provided.
     mapping(uint256 => UserRewardData) userRewardData;
-    //
-    // Basically, any point in time, the amount of reward token
-    // entitled to a user but is pending to be distributed is:
-    //
-    //   pending reward = user.unclaimAmount + (user.amount * (pool.accRewardPerShare - user.lastRewardPerShare)
-    //
-    // Whenever a user deposits or withdraws Staking tokens to a pool. Here's what happens:
-    //   1. The pool's `accRewardPerShare` (and `lastRewardTime`) gets updated.
-    //   2. User receives the pending reward sent to his/her address.
-    //   3. User's `lastRewardPerShare` gets updated.
-    //   4. User's `amount` gets updated.
   }
+  //
+  // Basically, any point in time, the amount of reward token
+  // entitled to a user but is pending to be distributed is:
+  //
+  //   pending reward = user.unclaimAmount + (user.amount * (pool.accRewardPerShare - user.lastRewardPerShare)
+  //
+  // Whenever a user deposits or withdraws Staking tokens to a pool. Here's what happens:
+  //   1. The pool's `accRewardPerShare` (and `lastRewardTime`) gets updated.
+  //   2. User receives the pending reward sent to his/her address.
+  //   3. User's `lastRewardPerShare` gets updated.
+  //   4. User's `amount` gets updated.
 
   struct PoolRewardData {
     address rewardToken;

@@ -29,9 +29,9 @@ contract Base is Test {
   address public jensen;
   address public rahoz;
 
-  uint32 fStartTime = 1686006366;
+  uint32 fStartTime = 1_686_006_366;
   uint32 fEndTime = fStartTime + 30 days;
-  uint256 MOCK_BALANCE = 10000 ether;
+  uint256 MOCK_BALANCE = 10_000 ether;
   uint256 MAX_UINT = type(uint256).max;
 
   uint256 mainnetFork;
@@ -39,7 +39,7 @@ contract Base is Test {
   function setUp() public virtual {
     mainnetFork = vm.createFork(MAINNET_RPC_URL);
     vm.selectFork(mainnetFork);
-    vm.rollFork(43551159);
+    vm.rollFork(43_551_159);
 
     deployer = makeAddr('Deployer');
     jensen = makeAddr('Jensen');
@@ -74,6 +74,7 @@ contract Base is Test {
     deal(STMATIC, jensen, MOCK_BALANCE);
 
     lm = new KSFairLaunchV3();
+    lm.updateOperator(deployer, true);
     IERC20(POOL_MATIC_STMATIC).approve(address(lm), MAX_UINT);
     IERC20(POOL_KNC_USDC).approve(address(lm), MAX_UINT);
     changePrank(jensen);

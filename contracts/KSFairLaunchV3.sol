@@ -4,12 +4,12 @@ pragma solidity 0.8.17;
 import {ReentrancyGuard} from '@openzeppelin/contracts/security/ReentrancyGuard.sol';
 import {SafeERC20} from '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import {IERC20Metadata} from '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
+import {KyberSwapRole} from '@ks-growth-utils-sc/contracts/KyberSwapRole.sol';
 import {GeneratedToken} from 'contracts/periphery/GeneratedToken.sol';
 import {IGeneratedToken} from 'contracts/interfaces/periphery/IGeneratedToken.sol';
 import {IKSFairLaunchV3} from 'contracts/interfaces/IKSFairLaunchV3.sol';
-import {KSAdmin} from 'contracts/base/KSAdmin.sol';
 
-contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
+contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
   using SafeERC20 for IERC20Metadata;
 
   uint256 internal constant PRECISION = 1e12;
@@ -33,7 +33,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
    * @param tokenAddress: reward token to withdraw
    * @param amount: amount token to withdraw
    */
-  function adminWithdraw(address tokenAddress, uint256 amount) external isAdmin {
+  function adminWithdraw(address tokenAddress, uint256 amount) external onlyOwner {
     if (whitelistStakeToken[tokenAddress]) revert NotAllowed();
     _transferToken(tokenAddress, msg.sender, amount);
   }
@@ -54,7 +54,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
     address[] calldata rewardTokens,
     uint256[] calldata rewardAmounts,
     string[2] calldata gTokenDatas
-  ) external isOperator {
+  ) external onlyOperator {
     if (startTime < block.timestamp || endTime <= startTime) revert InvalidTimes();
 
     PoolInfo storage pool = pools[poolLength];
@@ -105,13 +105,14 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
     uint32 startTime,
     uint32 endTime,
     uint256[] calldata rewardAmounts
-  ) external isOperator {
+  ) external onlyOperator {
     updatePoolRewards(pId);
     // check if pool has not started or already ended
     if (startTime <= block.timestamp || endTime <= startTime) revert InvalidTimes();
     PoolInfo storage pool = pools[pId];
-    if (pool.startTime <= block.timestamp && pool.endTime >= block.timestamp)
+    if (pool.startTime <= block.timestamp && pool.endTime >= block.timestamp) {
       revert InvalidPoolState();
+    }
     if (pool.poolRewards.length != rewardAmounts.length) revert InvalidLength();
 
     pool.startTime = startTime;
@@ -138,7 +139,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KSAdmin, ReentrancyGuard {
     uint256 pId,
     uint32 endTime,
     uint256[] calldata rewardAmounts
-  ) external isOperator {
+  ) external onlyOperator {
     updatePoolRewards(pId);
 
     PoolInfo storage pool = pools[pId];
