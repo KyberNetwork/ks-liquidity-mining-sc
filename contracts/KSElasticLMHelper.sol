@@ -15,7 +15,6 @@ import {IBasePositionManager} from 'contracts/interfaces/IBasePositionManager.so
 import {IPoolStorage} from 'contracts/interfaces/IPoolStorage.sol';
 import {IKSElasticLMV2 as IELMV2} from 'contracts/interfaces/IKSElasticLMV2.sol';
 
-
 contract KSElasticLMHelper is IKSElasticLMHelper, KyberSwapRole {
   error PositionNotEligible();
 

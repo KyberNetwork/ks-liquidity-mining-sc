@@ -324,18 +324,12 @@ contract KSElasticLMV2 is IKSElasticLMV2, KyberSwapRole, ReentrancyGuard {
   }
 
   /// @inheritdoc IKSElasticLMV2
-  function claimReward(
-    uint256 fId,
-    uint256[] calldata nftIds
-  ) external override nonReentrant {
+  function claimReward(uint256 fId, uint256[] calldata nftIds) external override nonReentrant {
     _claimReward(fId, nftIds, msg.sender);
   }
 
   /// @inheritdoc IKSElasticLMV2
-  function withdraw(
-    uint256 fId,
-    uint256[] calldata nftIds
-  ) external override nonReentrant {
+  function withdraw(uint256 fId, uint256[] calldata nftIds) external override nonReentrant {
     _claimReward(fId, nftIds, msg.sender);
 
     uint256 length = nftIds.length;
