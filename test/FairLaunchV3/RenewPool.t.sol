@@ -27,11 +27,11 @@ contract F3RenewPool is Base {
 
     bytes4 selector = bytes4(keccak256('InvalidTimes()'));
     vm.expectRevert(abi.encodeWithSelector(selector));
-    lm.renewPool(0, fStartTime, fStartTime, rewardAmounts);
+    lm.renewPool(0, fStartTime, fStartTime, rewardTokens, rewardAmounts);
 
     vm.warp(fStartTime + 1);
     vm.expectRevert(abi.encodeWithSelector(selector));
-    lm.renewPool(0, fStartTime, fStartTime, rewardAmounts);
+    lm.renewPool(0, fStartTime, fStartTime, rewardTokens, rewardAmounts);
   }
 
   function test_revert_renew_invalid_pool_state() public {
@@ -47,7 +47,7 @@ contract F3RenewPool is Base {
     vm.warp(fStartTime + 1 days);
     bytes4 selector = bytes4(keccak256('InvalidPoolState()'));
     vm.expectRevert(abi.encodeWithSelector(selector));
-    lm.renewPool(0, fStartTime + 2 days, fEndTime, rewardAmounts);
+    lm.renewPool(0, fStartTime + 2 days, fEndTime, rewardTokens, rewardAmounts);
   }
 
   function test_revert_renew_invalid_length() public {
@@ -63,7 +63,45 @@ contract F3RenewPool is Base {
     rewardAmounts = new uint256[](2);
     bytes4 selector = bytes4(keccak256('InvalidLength()'));
     vm.expectRevert(abi.encodeWithSelector(selector));
-    lm.renewPool(0, fStartTime, fEndTime, rewardAmounts);
+    lm.renewPool(0, fStartTime, fEndTime, rewardTokens, rewardAmounts);
+  }
+
+  function test_revert_renew_invalid_reward() public {
+    vm.warp(fStartTime - 1 days);
+    vm.startPrank(deployer);
+
+    address[] memory rewardTokens = new address[](3);
+    uint256[] memory rewardAmounts = new uint256[](3);
+    string[2] memory gTokenDatas;
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+    lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+
+    rewardTokens[0] = address(0);
+    rewardTokens[1] = address(1);
+    rewardTokens[2] = address(2);
+    bytes4 selector = bytes4(keccak256('InvalidReward()'));
+    vm.expectRevert(abi.encodeWithSelector(selector));
+    lm.renewPool(0, fStartTime, fEndTime, rewardTokens, rewardAmounts);
+  }
+
+  function test_revert_renew_invalid_reward_2() public {
+    vm.warp(fStartTime - 1 days);
+    vm.startPrank(deployer);
+
+    address[] memory rewardTokens = new address[](3);
+    uint256[] memory rewardAmounts = new uint256[](3);
+    string[2] memory gTokenDatas;
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+    lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+    rewardTokens[0] = POOL_KNC_USDC;
+    rewardTokens[1] = POOL_KNC_USDC;
+    rewardTokens[2] = POOL_KNC_USDC;
+    lm.addPool(ETH_ADDRESS, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+
+    bytes4 selector = bytes4(keccak256('InvalidReward()'));
+    vm.expectRevert(abi.encodeWithSelector(selector));
+    lm.renewPool(0, fStartTime, fEndTime, rewardTokens, rewardAmounts);
   }
 
   function test_revert_renew_not_operator() public {
@@ -78,7 +116,7 @@ contract F3RenewPool is Base {
 
     changePrank(jensen);
     vm.expectRevert('KyberSwapRole: not operator');
-    lm.renewPool(0, fStartTime, fEndTime, rewardAmounts);
+    lm.renewPool(0, fStartTime, fEndTime, rewardTokens, rewardAmounts);
   }
 
   function test_renew_normal() public {
@@ -95,7 +133,7 @@ contract F3RenewPool is Base {
     rewardAmounts[0] = 60 ether;
     rewardAmounts[1] = 180 ether;
     rewardAmounts[2] = 12_000e6;
-    lm.renewPool(0, fStartTime + 2 days, fEndTime + 2 days, rewardAmounts);
+    lm.renewPool(0, fStartTime + 2 days, fEndTime + 2 days, rewardTokens, rewardAmounts);
 
     (
       ,

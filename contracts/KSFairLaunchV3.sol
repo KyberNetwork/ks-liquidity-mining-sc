@@ -66,7 +66,10 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     }
 
     uint256 multiplierTo;
-    for (uint256 i = 0; i < rewardAmounts.length; i++) {
+    for (uint256 i; i < rewardAmounts.length; ) {
+      // Reward token should not be stake token
+      if (rewardTokens[i] == stakeToken || whitelistStakeToken[rewardTokens[i]])
+        revert InvalidReward();
       if (rewardTokens[i] != address(0)) {
         uint8 dToken = IERC20Metadata(rewardTokens[i]).decimals();
         multiplierTo = dToken >= 18 ? 1 : 10 ** (18 - dToken);
@@ -82,6 +85,10 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
           0
         )
       );
+
+      unchecked {
+        ++i;
+      }
     }
     pool.stakeToken = stakeToken;
     pool.startTime = startTime;
@@ -97,6 +104,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
    * @param pId: id of the pool to renew, must be pool that has not started or already ended
    * @param startTime: time where the reward starts
    * @param endTime: time where the reward ends
+   * @param rewardTokens: reward token list address
    * @param rewardAmounts: amount of total reward token for the pool for each reward token
    *   0 if we want to stop the pool from accumulating rewards
    */
@@ -104,6 +112,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     uint256 pId,
     uint32 startTime,
     uint32 endTime,
+    address[] calldata rewardTokens,
     uint256[] calldata rewardAmounts
   ) external onlyOperator {
     updatePoolRewards(pId);
@@ -119,12 +128,19 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     pool.endTime = endTime;
     pool.lastRewardTime = startTime;
 
-    for (uint256 i = 0; i < rewardAmounts.length; i++) {
+    for (uint256 i; i < rewardAmounts.length; ) {
+      if (
+        pool.poolRewards[i].rewardToken != rewardTokens[i] || whitelistStakeToken[rewardTokens[i]]
+      ) revert InvalidReward();
+
       pool.poolRewards[i].rewardPerSecond =
         (rewardAmounts[i] * pool.poolRewards[i].multiplier) /
         (endTime - startTime);
-    }
 
+      unchecked {
+        ++i;
+      }
+    }
     emit RenewPool(pId, startTime, endTime);
   }
 
@@ -132,12 +148,14 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
    * @dev Update a pool, allow to change end time, reward per second
    * @param pId: pool id to be renew
    * @param endTime: time where the reward ends
+   * @param rewardTokens: reward token list address
    * @param rewardAmounts: amount of total reward token for the pool for each reward token
    *   0 if we want to stop the pool from accumulating rewards
    */
   function updatePool(
     uint256 pId,
     uint32 endTime,
+    address[] calldata rewardTokens,
     uint256[] calldata rewardAmounts
   ) external onlyOperator {
     updatePoolRewards(pId);
@@ -150,12 +168,19 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     if (pool.poolRewards.length != rewardAmounts.length) revert InvalidLength();
 
     pool.endTime = endTime;
-    for (uint256 i = 0; i < rewardAmounts.length; i++) {
+    for (uint256 i; i < rewardAmounts.length; ) {
+      if (
+        pool.poolRewards[i].rewardToken != rewardTokens[i] || whitelistStakeToken[rewardTokens[i]]
+      ) revert InvalidReward();
+
       pool.poolRewards[i].rewardPerSecond =
         (rewardAmounts[i] * pool.poolRewards[i].multiplier) /
         (endTime - pool.startTime);
-    }
 
+      unchecked {
+        ++i;
+      }
+    }
     emit UpdatePool(pId, endTime);
   }
 
@@ -316,11 +341,15 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     rewardPerSeconds = new uint256[](pRewardsLength);
     accRewardPerShares = new uint256[](pRewardsLength);
 
-    for (uint256 i = 0; i < rewardTokens.length; i++) {
+    for (uint256 i; i < rewardTokens.length; ) {
       rewardTokens[i] = pool.poolRewards[i].rewardToken;
       multipliers[i] = pool.poolRewards[i].multiplier;
       rewardPerSeconds[i] = pool.poolRewards[i].rewardPerSecond;
       accRewardPerShares[i] = pool.poolRewards[i].accRewardPerShare;
+
+      unchecked {
+        ++i;
+      }
     }
   }
 
@@ -346,9 +375,12 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     uint256 pRewardsLength = pools[pId].poolRewards.length;
     unclaimedRewards = new uint256[](pRewardsLength);
     lastRewardPerShares = new uint256[](pRewardsLength);
-    for (uint256 i = 0; i < pRewardsLength; i++) {
+    for (uint256 i; i < pRewardsLength; ) {
       unclaimedRewards[i] = user.userRewardData[i].unclaimedReward;
       lastRewardPerShares[i] = user.userRewardData[i].lastRewardPerShare;
+      unchecked {
+        ++i;
+      }
     }
   }
 
@@ -370,7 +402,7 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     uint256 pLastRewardTime = pool.lastRewardTime;
     uint32 lastAccountedTime = _lastAccountedRewardTime(pId);
 
-    for (uint256 i = 0; i < pRewardsLength; i++) {
+    for (uint256 i; i < pRewardsLength; ) {
       uint256 _accRewardPerShare = pool.poolRewards[i].accRewardPerShare;
       if (lastAccountedTime > pLastRewardTime && totalStake != 0) {
         uint256 reward = pool.poolRewards[i].rewardPerSecond *
@@ -381,6 +413,10 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
         user.userRewardData[i].unclaimedReward +
         (user.amount * (_accRewardPerShare - user.userRewardData[i].lastRewardPerShare)) /
         PRECISION;
+
+      unchecked {
+        ++i;
+      }
     }
   }
 
@@ -417,26 +453,33 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
       // update user last reward per share to the latest pool reward per share
       // by right if user.amount is 0, user.unclaimedReward should be 0 as well,
       // except when user uses emergencyWithdraw function
-      for (uint256 i = 0; i < rTokensLength; i++) {
+      for (uint256 i; i < rTokensLength; ) {
         users[pId][to].userRewardData[i].lastRewardPerShare = pRewards[i].accRewardPerShare;
+        unchecked {
+          ++i;
+        }
       }
       return;
     }
 
-    for (uint256 i = 0; i < rTokensLength; i++) {
-      UserRewardData storage rewardData = users[pId][to].userRewardData[i];
+    for (uint256 j; j < rTokensLength; ) {
+      UserRewardData storage rewardData = users[pId][to].userRewardData[j];
       // user's unclaim reward + user's amount * (pool's accRewardPerShare - user's lastRewardPerShare) / precision
       uint256 pendingReward = rewardData.unclaimedReward +
-        (userAmount * (pRewards[i].accRewardPerShare - rewardData.lastRewardPerShare)) /
+        (userAmount * (pRewards[j].accRewardPerShare - rewardData.lastRewardPerShare)) /
         PRECISION;
       rewardData.unclaimedReward = shouldHarvest ? 0 : pendingReward;
       // update user last reward per share to the latest pool reward per share
-      rewardData.lastRewardPerShare = pRewards[i].accRewardPerShare;
+      rewardData.lastRewardPerShare = pRewards[j].accRewardPerShare;
 
       if (shouldHarvest && pendingReward > 0) {
-        uint256 amountTransfer = pendingReward / pRewards[i].multiplier;
-        _transferToken(pRewards[i].rewardToken, to, amountTransfer);
-        emit Harvest(to, pId, pRewards[i].rewardToken, amountTransfer, block.timestamp);
+        uint256 amountTransfer = pendingReward / pRewards[j].multiplier;
+        _transferToken(pRewards[j].rewardToken, to, amountTransfer);
+        emit Harvest(to, pId, pRewards[j].rewardToken, amountTransfer, block.timestamp);
+      }
+
+      unchecked {
+        ++j;
       }
     }
   }

@@ -33,6 +33,7 @@ avax = "https://avax.meowrpc.com"
 lineamain = "https://linea-mainnet.infura.io/v3/474d88f0f3bc480b900b6b7a630855b6"
 polygonzkevm = "https://zkevm-rpc.com"
 base = "https://base.blockpi.network/v1/rpc/public"
+scroll = "https://scroll.blockpi.network/v1/rpc/public"
 
 [etherscan]
 mainnet = { key = "${ETHERSCAN_KEY}" }

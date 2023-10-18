@@ -40,6 +40,19 @@ contract F3AddPool is Base {
     lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
   }
 
+  function test_revert_add_invalid_reward() public {
+    vm.startPrank(deployer);
+
+    address[] memory rewardTokens = new address[](3);
+    uint256[] memory rewardAmounts = new uint256[](3);
+    string[2] memory gTokenDatas;
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+    rewardTokens[0] = POOL_MATIC_STMATIC;
+    bytes4 selector = bytes4(keccak256('InvalidReward()'));
+    vm.expectRevert(abi.encodeWithSelector(selector));
+    lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+  }
+
   function test_revert_not_operator() public {
     vm.warp(fStartTime + 1 days);
     vm.startPrank(jensen);

@@ -27,11 +27,11 @@ contract F3UpdatePool is Base {
 
     bytes4 selector = bytes4(keccak256('InvalidTimes()'));
     vm.expectRevert(abi.encodeWithSelector(selector));
-    lm.updatePool(0, fStartTime - 2 days, rewardAmounts);
+    lm.updatePool(0, fStartTime - 2 days, rewardTokens, rewardAmounts);
 
     vm.warp(fStartTime + 1);
     vm.expectRevert(abi.encodeWithSelector(selector));
-    lm.updatePool(0, fStartTime, rewardAmounts);
+    lm.updatePool(0, fStartTime, rewardTokens, rewardAmounts);
   }
 
   function test_revert_update_invalid_pool_state() public {
@@ -47,7 +47,7 @@ contract F3UpdatePool is Base {
     vm.warp(fEndTime + 1 days);
     bytes4 selector = bytes4(keccak256('InvalidPoolState()'));
     vm.expectRevert(abi.encodeWithSelector(selector));
-    lm.updatePool(0, fEndTime + 2 days, rewardAmounts);
+    lm.updatePool(0, fEndTime + 2 days, rewardTokens, rewardAmounts);
   }
 
   function test_revert_update_invalid_length() public {
@@ -63,7 +63,46 @@ contract F3UpdatePool is Base {
     rewardAmounts = new uint256[](2);
     bytes4 selector = bytes4(keccak256('InvalidLength()'));
     vm.expectRevert(abi.encodeWithSelector(selector));
-    lm.updatePool(0, fEndTime, rewardAmounts);
+    lm.updatePool(0, fEndTime, rewardTokens, rewardAmounts);
+  }
+
+  function test_revert_update_invalid_reward() public {
+    vm.warp(fStartTime - 1 days);
+    vm.startPrank(deployer);
+
+    address[] memory rewardTokens = new address[](3);
+    uint256[] memory rewardAmounts = new uint256[](3);
+    string[2] memory gTokenDatas;
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+    lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+
+    rewardTokens[0] = address(0);
+    rewardTokens[1] = address(1);
+    rewardTokens[2] = address(2);
+    bytes4 selector = bytes4(keccak256('InvalidReward()'));
+    vm.expectRevert(abi.encodeWithSelector(selector));
+    lm.updatePool(0, fEndTime, rewardTokens, rewardAmounts);
+  }
+
+  function test_revert_update_invalid_reward_2() public {
+    vm.warp(fStartTime - 1 days);
+    vm.startPrank(deployer);
+
+    address[] memory rewardTokens = new address[](3);
+    uint256[] memory rewardAmounts = new uint256[](3);
+    string[2] memory gTokenDatas;
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+    lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+
+    rewardTokens[0] = POOL_KNC_USDC;
+    rewardTokens[1] = POOL_KNC_USDC;
+    rewardTokens[2] = POOL_KNC_USDC;
+    lm.addPool(ETH_ADDRESS, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+
+    bytes4 selector = bytes4(keccak256('InvalidReward()'));
+    vm.expectRevert(abi.encodeWithSelector(selector));
+    lm.updatePool(0, fEndTime, rewardTokens, rewardAmounts);
   }
 
   function test_revert_update_not_operator() public {
@@ -78,7 +117,7 @@ contract F3UpdatePool is Base {
 
     changePrank(jensen);
     vm.expectRevert('KyberSwapRole: not operator');
-    lm.updatePool(0, fEndTime, rewardAmounts);
+    lm.updatePool(0, fEndTime, rewardTokens, rewardAmounts);
   }
 
   function test_update_normal() public {
@@ -93,7 +132,7 @@ contract F3UpdatePool is Base {
     (, , , , , , , , uint256[] memory _rewardPerSeconds1, ) = lm.getPoolInfo(0);
 
     // increase end time to 1h, reward per second will be decreased
-    lm.updatePool(0, fEndTime + 3600, rewardAmounts);
+    lm.updatePool(0, fEndTime + 3600, rewardTokens, rewardAmounts);
 
     (
       ,
