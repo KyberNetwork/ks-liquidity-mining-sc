@@ -1,0 +1,63 @@
+# Script name
+name: Run Foundry tests
+
+# Prerequisites for execution: any actions with the pool-request
+on: [pull_request]
+
+# Task list
+jobs:
+  lint:
+    # Task name
+    name: Run Tests
+
+    # Run on a virtual machine with Ubuntu
+    runs-on: ubuntu-latest
+
+    # List of steps
+    steps:
+      # Use project code from a specific commit
+      # By default, the branch whose changes caused the script to run is used
+      - uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      # Configuring Node.js 18 to run on a virtual machine
+      - name: Use Node.js 18
+        uses: actions/setup-node@v1
+        with:
+          node-version: 18
+
+      # The described bash commands will be executed
+      - name: Install dependencies & compile contracts
+        run: |
+          yarn
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: nightly
+
+      - name: Run Forge build
+        run: |
+          forge --version
+          forge install --no-commit --no-git
+          forge build --sizes
+        id: build
+
+      - name: Run Foundry tests
+        env:
+          POLYGON_NODE_URL: ${{ secrets.POLYGON_NODE_URL }}
+          ETH_NODE_URL: ${{ secrets.ETH_NODE_URL }}
+          ARBITRUM_NODE_URL: ${{ secrets.ARBITRUM_NODE_URL }}
+          OP_NODE_URL: ${{ secrets.OP_NODE_URL }}
+          AVAX_NODE_URL: ${{ secrets.AVAX_NODE_URL }}
+          ETH_GOERLI_NODE_URL: ${{ secrets.ETH_GOERLI_NODE_URL }}
+          FTM_NODE_URL: ${{ secrets.FTM_NODE_URL }}
+          BSC_NODE_URL: ${{ secrets.BSC_NODE_URL }}
+          AVAX_FUJI_NODE_URL: ${{ secrets.AVAX_FUJI_NODE_URL }}
+          VELAS_NODE_URL: ${{ secrets.VELAS_NODE_URL }}
+          AURORA_NODE_URL: ${{ secrets.AURORA_NODE_URL }}
+          OASIS_NODE_URL: ${{ secrets.OASIS_NODE_URL }}
+          CRONOS_NODE_URL: ${{ secrets.CRONOS_NODE_URL }}
+          BTTC_NODE_URL: ${{ secrets.BTTC_NODE_URL }}
+        run: forge test -vvv
