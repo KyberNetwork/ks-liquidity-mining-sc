@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 interface IKSFairLaunchV3 {
   error NotAllowed();
   error InvalidTimes();
+  error InvalidReward();
   error InvalidPoolState();
   error InvalidLength();
   error InvalidPool();
