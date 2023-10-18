@@ -84,6 +84,27 @@ contract F3UpdatePool is Base {
     lm.updatePool(0, fEndTime, rewardTokens, rewardAmounts);
   }
 
+  function test_revert_update_invalid_reward_2() public {
+    vm.warp(fStartTime - 1 days);
+    vm.startPrank(deployer);
+
+    address[] memory rewardTokens = new address[](3);
+    uint256[] memory rewardAmounts = new uint256[](3);
+    string[2] memory gTokenDatas;
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+    lm.addPool(POOL_MATIC_STMATIC, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+
+    rewardTokens[0] = POOL_KNC_USDC;
+    rewardTokens[1] = POOL_KNC_USDC;
+    rewardTokens[2] = POOL_KNC_USDC;
+    lm.addPool(ETH_ADDRESS, fStartTime, fEndTime, rewardTokens, rewardAmounts, gTokenDatas);
+    (rewardTokens, rewardAmounts) = _getRewardData3();
+
+    bytes4 selector = bytes4(keccak256('InvalidReward()'));
+    vm.expectRevert(abi.encodeWithSelector(selector));
+    lm.updatePool(0, fEndTime, rewardTokens, rewardAmounts);
+  }
+
   function test_revert_update_not_operator() public {
     vm.warp(fStartTime - 1 days);
     vm.startPrank(deployer);

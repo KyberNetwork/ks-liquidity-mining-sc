@@ -129,7 +129,9 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
     pool.lastRewardTime = startTime;
 
     for (uint256 i; i < rewardAmounts.length; ) {
-      if (pool.poolRewards[i].rewardToken != rewardTokens[i]) revert InvalidReward();
+      if (
+        pool.poolRewards[i].rewardToken != rewardTokens[i] || whitelistStakeToken[rewardTokens[i]]
+      ) revert InvalidReward();
 
       pool.poolRewards[i].rewardPerSecond =
         (rewardAmounts[i] * pool.poolRewards[i].multiplier) /
@@ -167,7 +169,9 @@ contract KSFairLaunchV3 is IKSFairLaunchV3, KyberSwapRole, ReentrancyGuard {
 
     pool.endTime = endTime;
     for (uint256 i; i < rewardAmounts.length; ) {
-      if (pool.poolRewards[i].rewardToken != rewardTokens[i]) revert InvalidReward();
+      if (
+        pool.poolRewards[i].rewardToken != rewardTokens[i] || whitelistStakeToken[rewardTokens[i]]
+      ) revert InvalidReward();
 
       pool.poolRewards[i].rewardPerSecond =
         (rewardAmounts[i] * pool.poolRewards[i].multiplier) /
